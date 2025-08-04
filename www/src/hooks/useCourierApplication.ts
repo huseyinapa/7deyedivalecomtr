@@ -106,14 +106,15 @@ export function useAdminApplications(filters: ApplicationFilters) {
   const { data, error, isLoading, mutate } = useSWR(
     key,
     async () => {
-      const { data } = await adminApiService.getApplications(filters);
+      const response = await adminApiService.getApplications(filters);
+      console.log(response);
       console.log("API Response Debug:", {
-        applications: data?.data.applications,
-        applicationsLength: data?.data.applications?.length,
-        pagination: data?.data.pagination,
-        summary: data?.data.summary,
+        applications: response.data?.applications,
+        applicationsLength: response.data?.applications?.length,
+        pagination: response.data?.pagination,
+        summary: response.data?.summary,
       });
-      return data;
+      return response.data;
     },
     {
       revalidateOnFocus: false,
@@ -122,11 +123,11 @@ export function useAdminApplications(filters: ApplicationFilters) {
   );
 
   return {
-    data: data?.data,
-    applications: data?.data?.applications,
-    applicationsLength: data?.data?.applications?.length,
-    pagination: data?.data?.pagination,
-    summary: data?.data?.summary,
+    data: data,
+    applications: data?.applications,
+    applicationsLength: data?.applications?.length,
+    pagination: data?.pagination,
+    summary: data?.summary,
     isLoading,
     isError: !!error,
     error,

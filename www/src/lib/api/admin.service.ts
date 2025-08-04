@@ -163,21 +163,19 @@ export interface ApplicationDetails extends ApplicationSummary {
 }
 
 export interface ApplicationsResponse {
-  data: {
-    applications: ApplicationSummary[];
-    pagination: {
-      page: number;
-      limit: number;
-      total: number;
-      totalPages: number;
-      hasNext: boolean;
-      hasPrev: boolean;
-    };
-    summary: {
-      totalApplications: number;
-      byStatus: Record<string, number>;
-      byWorkPeriod: Record<string, number>;
-    };
+  applications: ApplicationSummary[];
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+    hasNext: boolean;
+    hasPrev: boolean;
+  };
+  summary: {
+    totalApplications: number;
+    byStatus: Record<string, number>;
+    byWorkPeriod: Record<string, number>;
   };
 }
 
@@ -402,7 +400,9 @@ class AdminApiService {
     if (filters.sortBy) params.append("sortBy", filters.sortBy);
     if (filters.sortOrder) params.append("sortOrder", filters.sortOrder);
 
-    return apiClient.get(`${this.baseUrl}/applications?${params.toString()}`);
+    return (
+      await apiClient.get(`${this.baseUrl}/applications?${params.toString()}`)
+    ).data;
   }
 
   // Get detailed application by ID

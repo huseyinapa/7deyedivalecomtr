@@ -27,15 +27,15 @@ export default function LoginPage() {
     setMounted(true);
 
     // Debug: Auto login for development
-    if (process.env.NODE_ENV === 'development' && !user && !authLoading) {
-      console.log("Debug: Auto-login attempt");
-      setTimeout(() => {
-        if (!isLoading && credentials.email && credentials.password) {
-          console.log("Debug: Performing auto-login");
-          handleSubmit(new Event('submit') as any);
-        }
-      }, 1000);
-    }
+    // if (process.env.NODE_ENV === 'development' && !user && !authLoading) {
+    //   console.log("Debug: Auto-login attempt");
+    //   setTimeout(() => {
+    //     if (!isLoading && credentials.email && credentials.password) {
+    //       console.log("Debug: Performing auto-login");
+    //       handleSubmit(new Event('submit') as any);
+    //     }
+    //   }, 1000);
+    // }
   }, []);
 
   // Redirect if already authenticated
