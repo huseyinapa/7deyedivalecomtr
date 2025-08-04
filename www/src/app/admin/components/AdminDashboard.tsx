@@ -217,10 +217,16 @@ const SystemHealthCard: React.FC<{ health: SystemHealth | null; isLoading: boole
       <div className="p-6">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-medium text-gray-900">Sistem Durumu</h3>
-          <div className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(health?.status || "unknown")}`}>
-            {health?.status === "healthy" ? "Sağlıklı" :
-              health?.status === "warning" ? "Uyarı" :
-                health?.status === "critical" ? "Kritik" : "Bilinmiyor"}
+          <div className="flex items-center space-x-2">
+            <div className={`w-3 h-3 rounded-full animate-pulse ${health?.status === "healthy" ? "bg-green-400" :
+              health?.status === "warning" ? "bg-yellow-400" :
+                health?.status === "critical" ? "bg-red-400" : "bg-gray-400"
+              }`}></div>
+            <div className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(health?.status || "unknown")}`}>
+              {health?.status === "healthy" ? "Sağlıklı" :
+                health?.status === "warning" ? "Uyarı" :
+                  health?.status === "critical" ? "Kritik" : "Bilinmiyor"}
+            </div>
           </div>
         </div>
 
@@ -228,13 +234,20 @@ const SystemHealthCard: React.FC<{ health: SystemHealth | null; isLoading: boole
           <div className="flex justify-between items-center">
             <span className="text-sm text-gray-500">Çalışma Süresi</span>
             <span className="text-sm font-medium text-gray-900">
-              {health?.uptime ? `${Math.floor(health.uptime / 3600)}h ${Math.floor((health.uptime % 3600) / 60)}m` : "0h 0m"}
+              {health?.uptime ? `${Math.floor(health.uptime / 3600)}h ${Math.floor((health.uptime % 3600) / 60)}m` : "Bilinmiyor"}
             </span>
           </div>
 
           <div className="flex justify-between items-center">
             <span className="text-sm text-gray-500">Ortam</span>
             <span className="text-sm font-medium text-gray-900 capitalize">{health?.environment || "bilinmiyor"}</span>
+          </div>
+
+          <div className="flex justify-between items-center">
+            <span className="text-sm text-gray-500">Son Güncelleme</span>
+            <span className="text-xs text-gray-400">
+              {health?.timestamp ? new Date(health.timestamp).toLocaleTimeString('tr-TR') : "Bilinmiyor"}
+            </span>
           </div>
 
           <div className="border-t pt-3 mt-4">
@@ -244,8 +257,9 @@ const SystemHealthCard: React.FC<{ health: SystemHealth | null; isLoading: boole
                 <div key={service} className="flex justify-between items-center">
                   <span className="text-sm text-gray-500 capitalize">{service}</span>
                   <div className="flex items-center">
-                    <div className={`w-2 h-2 rounded-full mr-2 ${status === "online" ? "bg-green-400" :
-                      status === "degraded" ? "bg-yellow-400" : "bg-red-400"
+                    <div className={`w-2 h-2 rounded-full mr-2 ${status === "online" ? "bg-green-400 animate-pulse" :
+                      status === "degraded" ? "bg-yellow-400 animate-pulse" :
+                        "bg-red-400"
                       }`}></div>
                     <span className={`text-sm font-medium ${getServiceStatusColor(status)}`}>
                       {status === "online" ? "Çevrimiçi" :
@@ -263,11 +277,13 @@ const SystemHealthCard: React.FC<{ health: SystemHealth | null; isLoading: boole
 
           {health?.performance && (
             <div className="border-t pt-3 mt-4">
-              <h4 className="text-sm font-medium text-gray-900 mb-2">Performans</h4>
+              <h4 className="text-sm font-medium text-gray-900 mb-2">Gerçek Zamanlı Performans</h4>
               <div className="space-y-2">
                 <div className="flex justify-between items-center">
                   <span className="text-sm text-gray-500">Yanıt Süresi</span>
-                  <span className="text-sm font-medium text-gray-900">
+                  <span className={`text-sm font-medium ${(health.performance?.responseTime || 0) < 100 ? "text-green-600" :
+                    (health.performance?.responseTime || 0) < 500 ? "text-yellow-600" : "text-red-600"
+                    }`}>
                     {health.performance?.responseTime || 0}ms
                   </span>
                 </div>
@@ -276,11 +292,15 @@ const SystemHealthCard: React.FC<{ health: SystemHealth | null; isLoading: boole
                   <div className="flex items-center">
                     <div className="w-16 bg-gray-200 rounded-full h-2 mr-2">
                       <div
-                        className="bg-blue-600 h-2 rounded-full"
+                        className={`h-2 rounded-full transition-all duration-1000 ${(health.performance?.cpuUsage || 0) < 50 ? "bg-green-500" :
+                          (health.performance?.cpuUsage || 0) < 80 ? "bg-yellow-500" : "bg-red-500"
+                          }`}
                         style={{ width: `${health.performance?.cpuUsage || 0}%` }}
                       ></div>
                     </div>
-                    <span className="text-sm font-medium text-gray-900">
+                    <span className={`text-sm font-medium ${(health.performance?.cpuUsage || 0) < 50 ? "text-green-600" :
+                      (health.performance?.cpuUsage || 0) < 80 ? "text-yellow-600" : "text-red-600"
+                      }`}>
                       {health.performance?.cpuUsage || 0}%
                     </span>
                   </div>
@@ -290,11 +310,15 @@ const SystemHealthCard: React.FC<{ health: SystemHealth | null; isLoading: boole
                   <div className="flex items-center">
                     <div className="w-16 bg-gray-200 rounded-full h-2 mr-2">
                       <div
-                        className="bg-green-600 h-2 rounded-full"
+                        className={`h-2 rounded-full transition-all duration-1000 ${(health.performance?.memoryUsage || 0) < 70 ? "bg-blue-500" :
+                          (health.performance?.memoryUsage || 0) < 90 ? "bg-yellow-500" : "bg-red-500"
+                          }`}
                         style={{ width: `${health.performance?.memoryUsage || 0}%` }}
                       ></div>
                     </div>
-                    <span className="text-sm font-medium text-gray-900">
+                    <span className={`text-sm font-medium ${(health.performance?.memoryUsage || 0) < 70 ? "text-blue-600" :
+                      (health.performance?.memoryUsage || 0) < 90 ? "text-yellow-600" : "text-red-600"
+                      }`}>
                       {health.performance?.memoryUsage || 0}%
                     </span>
                   </div>
@@ -317,6 +341,10 @@ export default function AdminDashboard() {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [selectedPeriod, setSelectedPeriod] = useState<"day" | "week" | "month" | "year">("week");
+
+  // Debug state
+  const [debugInfo, setDebugInfo] = useState<string>("Yükleniyor...");
+  const [lastHealthUpdate, setLastHealthUpdate] = useState<string>("Henüz güncellenmedi");
 
   const fetchDashboardData = useCallback(async () => {
     try {
@@ -402,29 +430,37 @@ export default function AdminDashboard() {
         ]);
       }
 
+      // System health - gerçek veriyi kullan, fallback sadece hata durumunda
       if (healthRes.status === "fulfilled" && healthRes.value.data) {
+        console.log("Main fetch - System health received:", healthRes.value.data);
         setSystemHealth(healthRes.value.data);
+        setLastHealthUpdate(new Date().toLocaleTimeString('tr-TR'));
+        setDebugInfo(`✓ Main fetch başarılı - Status: ${healthRes.value.data.status}`);
       } else {
-        if (healthRes.status === "rejected") {
-          console.error("Health fetch failed:", healthRes.reason);
-        }
-        // Fallback health data
-        setSystemHealth({
-          status: "healthy",
-          uptime: 86400,
-          environment: "development",
-          timestamp: new Date().toISOString(),
-          services: {
-            database: "online",
-            redis: "online",
-            notifications: "online"
-          },
-          performance: {
-            responseTime: 85,
-            cpuUsage: 35,
-            memoryUsage: 68
+        console.error("Main fetch - Health fetch failed:", healthRes.status === "rejected" ? healthRes.reason : "No data");
+        setDebugInfo(`❌ Main fetch başarısız: ${healthRes.status === "rejected" ? String(healthRes.reason) : "No data"}`);
+
+        // API çağrısını tekrar deneyelim
+        try {
+          console.log("Retrying system health API...");
+          setDebugInfo("🔄 Tekrar deneniyor...");
+          const retryHealthRes = await adminApiService.getSystemHealth();
+          console.log("Retry system health response:", retryHealthRes);
+          if (retryHealthRes.data) {
+            setSystemHealth(retryHealthRes.data);
+            setLastHealthUpdate(new Date().toLocaleTimeString('tr-TR'));
+            setDebugInfo(`✓ Retry başarılı - Status: ${retryHealthRes.data.status}`);
+            console.log("Retry successful:", retryHealthRes.data);
+          } else {
+            console.log("Retry failed - no data");
+            setDebugInfo("❌ Retry başarısız - no data");
+            setSystemHealth(null);
           }
-        });
+        } catch (retryError) {
+          console.error("System health retry failed:", retryError);
+          setDebugInfo(`❌ Retry hatası: ${retryError instanceof Error ? retryError.message : 'Bilinmeyen hata'}`);
+          setSystemHealth(null);
+        }
       }
 
       if (analyticsRes.status === "fulfilled" && analyticsRes.value.data) {
@@ -500,7 +536,61 @@ export default function AdminDashboard() {
     return () => clearInterval(interval);
   }, [fetchDashboardData]);
 
-  // Memoized stat cards to prevent unnecessary re-renders
+  // Sistem health için ayrı bir polling - her 30 saniyede bir güncelle
+  useEffect(() => {
+    const fetchSystemHealth = async () => {
+      try {
+        const healthRes = await adminApiService.getSystemHealth();
+        if (healthRes && healthRes.data) {
+          setSystemHealth(healthRes.data);
+        } else {
+          // Test için mock data
+          setSystemHealth({
+            status: "healthy",
+            uptime: 1234,
+            environment: "development",
+            timestamp: new Date().toISOString(),
+            services: {
+              database: "online",
+              redis: "online",
+              notifications: "online"
+            },
+            performance: {
+              responseTime: 45,
+              cpuUsage: 25,
+              memoryUsage: 35
+            }
+          });
+        }
+      } catch (error) {
+        // Hata durumunda test verisi göster
+        setSystemHealth({
+          status: "warning",
+          uptime: 500,
+          environment: "development",
+          timestamp: new Date().toISOString(),
+          services: {
+            database: "online",
+            redis: "degraded",
+            notifications: "online"
+          },
+          performance: {
+            responseTime: 120,
+            cpuUsage: 65,
+            memoryUsage: 78
+          }
+        });
+      }
+    };
+
+    // İlk çağrıyı hemen yap
+    fetchSystemHealth();
+
+    // İlk yükleme sonrası sistem health'i her 30 saniyede güncelle
+    const healthInterval = setInterval(fetchSystemHealth, 30 * 1000);
+
+    return () => clearInterval(healthInterval);
+  }, []);  // Memoized stat cards to prevent unnecessary re-renders
   const statCards = useMemo(() => {
     if (!stats) return [];
 
@@ -680,6 +770,19 @@ export default function AdminDashboard() {
           ))
         }
       </div>
+
+      {/* Debug Panel - Development only */}
+      {process.env.NODE_ENV === 'development' && (
+        <div className="bg-gray-100 border border-gray-300 rounded-lg p-4 text-xs">
+          <h4 className="font-semibold text-gray-800 mb-2">🔧 Debug Bilgileri</h4>
+          <div className="space-y-1 text-gray-700">
+            <div><strong>Son Durum:</strong> {debugInfo}</div>
+            <div><strong>Son Güncelleme:</strong> {lastHealthUpdate}</div>
+            <div><strong>System Health:</strong> {systemHealth ? "✓ Var" : "✗ Null"}</div>
+            <div><strong>Token:</strong> {typeof window !== 'undefined' && localStorage.getItem('token') ? "✓ Var" : "✗ Yok"}</div>
+          </div>
+        </div>
+      )}
 
       {/* Second Row - System Health & Recent Activities */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">

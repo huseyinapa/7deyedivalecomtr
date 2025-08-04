@@ -15,8 +15,8 @@ export default function LoginPage() {
   const { user, isLoading: authLoading } = useAuth();
 
   const [credentials, setCredentials] = useState({
-    email: "",
-    password: "",
+    email: "admin@example.com", // Debug: admin credentials pre-filled
+    password: "adminPassword123", // Debug: admin credentials pre-filled
   });
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -25,6 +25,17 @@ export default function LoginPage() {
   // Mount check
   useEffect(() => {
     setMounted(true);
+
+    // Debug: Auto login for development
+    if (process.env.NODE_ENV === 'development' && !user && !authLoading) {
+      console.log("Debug: Auto-login attempt");
+      setTimeout(() => {
+        if (!isLoading && credentials.email && credentials.password) {
+          console.log("Debug: Performing auto-login");
+          handleSubmit(new Event('submit') as any);
+        }
+      }, 1000);
+    }
   }, []);
 
   // Redirect if already authenticated

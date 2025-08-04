@@ -228,7 +228,7 @@ class AdminApiService {
   }
 
   async getSystemHealth(): Promise<ApiResponse<SystemHealth>> {
-    return apiClient.get(`${this.baseUrl}/system/health`);
+    return (await apiClient.get(`${this.baseUrl}/system/health`)).data;
   }
 
   async getRecentActivities(

@@ -455,7 +455,7 @@ export default function ApplicationPageNew() {
               >
                 Kapat
               </button>
-              <button
+              {/* <button
                 onClick={() => {
                   // Burada durum değiştirme işlemi yapılabilir
                   console.log('Status change for:', selectedApplication.id);
@@ -463,7 +463,7 @@ export default function ApplicationPageNew() {
                 className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 border border-transparent rounded-md hover:bg-indigo-700"
               >
                 Durum Değiştir
-              </button>
+              </button> */}
             </div>
           </div>
         </div>

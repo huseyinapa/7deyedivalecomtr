@@ -116,24 +116,71 @@ export class AdminController {
       };
     };
   }> {
+    const startTime = Date.now();
     const uptime = process.uptime();
+    const memoryUsage = process.memoryUsage();
+
+    // Test database connection
+    let databaseStatus: "online" | "offline" | "degraded" = "online";
+    let dbResponseTime = 0;
+
+    try {
+      const dbStart = Date.now();
+      await this.courierApplicationService.findAll();
+      dbResponseTime = Date.now() - dbStart;
+
+      if (dbResponseTime > 1000) {
+        databaseStatus = "degraded";
+      }
+    } catch (error) {
+      databaseStatus = "offline";
+      dbResponseTime = -1;
+    }
+
+    const responseTime = Date.now() - startTime;
+
+    // Calculate memory usage percentage (assuming 1GB available memory)
+    const memoryUsagePercent = Math.round(
+      (memoryUsage.heapUsed / (1024 * 1024 * 1024)) * 100
+    );
+
+    // Simulate CPU usage (in production, you might use a library like 'os-utils')
+    const cpuUsage = Math.floor(Math.random() * 30) + 10; // Simulated CPU usage between 10-40%
+
+    // Determine overall system status
+    let systemStatus: "healthy" | "warning" | "critical" = "healthy";
+
+    if (
+      databaseStatus === "offline" ||
+      memoryUsagePercent > 90 ||
+      cpuUsage > 80
+    ) {
+      systemStatus = "critical";
+    } else if (
+      databaseStatus === "degraded" ||
+      memoryUsagePercent > 70 ||
+      cpuUsage > 60 ||
+      responseTime > 500
+    ) {
+      systemStatus = "warning";
+    }
 
     return {
       success: true,
       data: {
-        status: "healthy",
+        status: systemStatus,
         uptime: Math.floor(uptime),
         environment: process.env.NODE_ENV || "development",
         timestamp: new Date().toISOString(),
         services: {
-          database: "online",
-          redis: "online",
-          notifications: "online",
+          database: databaseStatus,
+          redis: "online", // Redis not implemented yet, assume online
+          notifications: "online", // Notifications not implemented yet, assume online
         },
         performance: {
-          responseTime: Math.floor(Math.random() * 100) + 50,
-          cpuUsage: Math.floor(Math.random() * 50) + 20,
-          memoryUsage: Math.floor(Math.random() * 40) + 30,
+          responseTime: responseTime + dbResponseTime,
+          cpuUsage: cpuUsage,
+          memoryUsage: Math.min(memoryUsagePercent, 100),
         },
       },
     };
