@@ -15,8 +15,8 @@ export default function LoginPage() {
   const { user, isLoading: authLoading } = useAuth();
 
   const [credentials, setCredentials] = useState({
-    email: "admin@example.com", // Debug: admin credentials pre-filled
-    password: "adminPassword123", // Debug: admin credentials pre-filled
+    email: "", // Debug: admin credentials pre-filled
+    password: "", // Debug: admin credentials pre-filled
   });
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);

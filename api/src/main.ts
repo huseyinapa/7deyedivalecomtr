@@ -54,6 +54,10 @@ async function bootstrap() {
         }
       }
 
+      // TEMPORARY: Log the origin that's being blocked for debugging
+      console.log(`CORS blocked origin: ${origin}`);
+      console.log(`Allowed origins: ${corsOrigins.join(", ")}`);
+
       callback(new Error("Not allowed by CORS"));
     },
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
