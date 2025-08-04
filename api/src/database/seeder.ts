@@ -1,6 +1,7 @@
 import { DataSource } from "typeorm";
 import { config } from "dotenv";
 import { UserSeeder } from "./seeds/user.seeder";
+import { CourierApplicationSeeder } from "./seeds/courier-application.seeder";
 import { resolve } from "path";
 
 // Initialize environment variables
@@ -55,6 +56,9 @@ const runSeeders = async (dataSource: DataSource): Promise<void> => {
     await dataSource.transaction(async (entityManager) => {
       await userSeeder.run(entityManager);
     });
+
+    // Run courier application seeder
+    await CourierApplicationSeeder.run(dataSource);
 
     console.log("Seeders executed successfully");
   } catch (error) {

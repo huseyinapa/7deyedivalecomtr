@@ -8,31 +8,32 @@ export { authService } from "./auth.service";
 export { callCourierService } from "./call-courier.service";
 export { courierApplicationService } from "./courier-application.service";
 export { courierServiceService } from "./courier-service.service";
+export { adminApiService } from "./admin.service";
 
 // Type exports - prefer importing from @/types instead
 export type {
   User,
   LoginCredentials,
   RegisterData,
-  AuthResponse
+  AuthResponse,
 } from "./auth.service";
 
 export type {
   CallCourier,
   CreateCallCourierDto,
-  UpdateCallCourierDto
+  UpdateCallCourierDto,
 } from "./call-courier.service";
 
 export type {
   CourierApplication,
   CreateCourierApplicationDto,
-  UpdateCourierApplicationDto
+  UpdateCourierApplicationDto,
 } from "./courier-application.service";
 
 export type {
   CourierService,
   CreateCourierServiceDto,
-  UpdateCourierServiceDto
+  UpdateCourierServiceDto,
 } from "./courier-service.service";
 
 // Re-export axios instance and types

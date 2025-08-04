@@ -9,13 +9,13 @@ import ContactInformation from "./components/contactInfo";
 import JobExperience from "./components/jobExperience";
 import Notes from "./components/notes";
 import uid from "@/utils/uid";
-import { useCourierApplicationMutations } from "@/hooks/useCourierApplication";
+import { useCreateCourierApplication } from "@/hooks/useCourierApplication";
 import { useRateLimit } from "@/hooks/useRateLimit";
 import { RateLimitWarning } from "@/components/ui/RateLimitWarning";
 import { ApplicationData, ValidationResult } from "@/types";
 
 export default function Page(): JSX.Element {
-  const { createApplication } = useCourierApplicationMutations();
+  const { createApplication } = useCreateCourierApplication();
   const {
     rateLimitInfo,
     handleRateLimitError,
@@ -256,8 +256,8 @@ export default function Page(): JSX.Element {
           type="submit"
           disabled={isSubmitting || rateLimitInfo.isLimited}
           className={`w-52 lg:w-[20%] xl:w-[21%] 2xl:w-[22%] min-[2000px]:w-[450px] text-white rounded-3xl px-4 py-2 font-medium transition-colors ${isSubmitting || rateLimitInfo.isLimited
-              ? 'bg-gray-400 cursor-not-allowed'
-              : 'bg-[#333] hover:bg-gray-700'
+            ? 'bg-gray-400 cursor-not-allowed'
+            : 'bg-[#333] hover:bg-gray-700'
             }`}
         >
           {isSubmitting

@@ -14,6 +14,6 @@ export default registerAs("database", (): DataSourceOptions => {
     entities: [resolve(__dirname, "../../**/*.entity{.ts,.js}")],
     migrations: [resolve(__dirname, "../../database/migrations/**/*{.ts,.js}")],
     synchronize: process.env.DB_SYNCHRONIZE === "true",
-    logging: process.env.NODE_ENV === "development",
+    logging: process.env.NODE_ENV !== "production",
   };
 });

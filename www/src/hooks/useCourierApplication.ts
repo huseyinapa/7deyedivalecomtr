@@ -5,6 +5,12 @@ import {
   type CourierApplication,
   type UpdateCourierApplicationDto,
 } from "@/lib/api";
+import {
+  adminApiService,
+  type ApplicationFilters,
+  type ApplicationsResponse,
+  type ApplicationDetails,
+} from "@/lib/api/admin.service";
 
 /**
  * Hook to fetch all courier applications
@@ -22,62 +28,182 @@ export function useCourierApplications() {
   return {
     applications: data || [],
     isLoading,
-    isError: error,
+    isError: !!error,
+    error,
     refresh: mutate,
   };
 }
 
 /**
- * Hook to fetch a single courier application
+ * Hook to create a new courier application
  */
-export function useCourierApplication(id: string | null) {
+export function useCreateCourierApplication() {
+  const createApplication = async (data: CreateCourierApplicationDto) => {
+    try {
+      const response = await courierApplicationService.create(data);
+      return response;
+    } catch (error) {
+      console.error("Error creating courier application:", error);
+      throw error;
+    }
+  };
+
+  return {
+    createApplication,
+  };
+}
+
+/**
+ * Hook to get a single courier application
+ */
+export function useCourierApplication(id: string) {
   const { data, error, isLoading, mutate } = useSWR(
     id ? `/courier-application/${id}` : null,
-    () => (id ? courierApplicationService.findOne(id) : null),
+    () => courierApplicationService.findOne(id),
     {
       revalidateOnFocus: false,
+      revalidateOnReconnect: true,
     }
   );
 
   return {
     application: data,
     isLoading,
-    isError: error,
+    isError: !!error,
+    error,
     refresh: mutate,
   };
 }
 
 /**
- * Hook for courier application mutations
+ * Hook to update a courier application
  */
-export function useCourierApplicationMutations() {
-  const createApplication = async (
-    data: CreateCourierApplicationDto
-  ): Promise<CourierApplication> => {
-    return await courierApplicationService.create(data);
-  };
-
+export function useUpdateCourierApplication() {
   const updateApplication = async (
     id: string,
     data: UpdateCourierApplicationDto
-  ): Promise<CourierApplication> => {
-    return await courierApplicationService.update(id, data);
-  };
-
-  const deleteApplication = async (id: string): Promise<void> => {
-    return await courierApplicationService.remove(id);
-  };
-
-  const checkUidUnique = async (
-    uid: string
-  ): Promise<{ isUnique: boolean }> => {
-    return await courierApplicationService.checkUidUnique(uid);
+  ) => {
+    try {
+      const response = await courierApplicationService.update(id, data);
+      return response;
+    } catch (error) {
+      console.error("Error updating courier application:", error);
+      throw error;
+    }
   };
 
   return {
-    createApplication,
     updateApplication,
-    deleteApplication,
-    checkUidUnique,
+  };
+}
+
+/**
+ * Hook for admin to get applications with filters
+ */
+export function useAdminApplications(filters: ApplicationFilters) {
+  const key = `admin/applications?${JSON.stringify(filters)}`;
+
+  const { data, error, isLoading, mutate } = useSWR(
+    key,
+    async () => {
+      const { data } = await adminApiService.getApplications(filters);
+      console.log("API Response Debug:", {
+        applications: data?.data.applications,
+        applicationsLength: data?.data.applications?.length,
+        pagination: data?.data.pagination,
+        summary: data?.data.summary,
+      });
+      return data;
+    },
+    {
+      revalidateOnFocus: false,
+      revalidateOnReconnect: true,
+    }
+  );
+
+  return {
+    data: data?.data,
+    applications: data?.data?.applications,
+    applicationsLength: data?.data?.applications?.length,
+    pagination: data?.data?.pagination,
+    summary: data?.data?.summary,
+    isLoading,
+    isError: !!error,
+    error,
+    refresh: mutate,
+  };
+}
+
+/**
+ * Hook for admin to get application statistics
+ */
+export function useApplicationStatistics(period: "week" | "month" | "year") {
+  const { data, error, isLoading, mutate } = useSWR(
+    `/admin/applications/statistics/${period}`,
+    async () => {
+      const response = await adminApiService.getApplicationStatistics(period);
+      return response;
+    },
+    {
+      revalidateOnFocus: false,
+      revalidateOnReconnect: true,
+    }
+  );
+
+  return {
+    statistics: data?.data,
+    isLoading,
+    isError: !!error,
+    error,
+    refresh: mutate,
+  };
+}
+
+/**
+ * Hook for admin mutations (status updates, exports, etc.)
+ */
+export function useAdminApplicationMutations() {
+  const updateStatus = async (id: string, status: string) => {
+    try {
+      const response = await adminApiService.updateApplicationStatus(
+        id,
+        status
+      );
+      return response;
+    } catch (error) {
+      console.error("Error updating application status:", error);
+      throw error;
+    }
+  };
+
+  const exportApplications = async (filters?: Partial<ApplicationFilters>) => {
+    try {
+      const response = await adminApiService.exportApplications(filters || {});
+      return response;
+    } catch (error) {
+      console.error("Error exporting applications:", error);
+      throw error;
+    }
+  };
+
+  const bulkUpdateStatus = async (ids: string[], status: string) => {
+    try {
+      // Bu fonksiyon henüz backend'de mevcut değil
+      // Şimdilik tek tek update yapalım
+      const promises = ids.map((id) =>
+        adminApiService.updateApplicationStatus(id, status)
+      );
+      const responses = await Promise.all(promises);
+      return responses;
+    } catch (error) {
+      console.error("Error bulk updating applications:", error);
+      throw error;
+    }
+  };
+
+  return {
+    updateStatus,
+    exportApplications,
+    bulkUpdateStatus,
   };
 }

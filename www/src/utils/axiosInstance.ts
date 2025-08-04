@@ -32,9 +32,35 @@ export interface ApiError {
 
 /**
  * Base axios instance configuration
+ * - Development: localhost:7700 (backend port)
+ * - Production: Environment variable or production URL
  */
-const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:7700";
+const getBaseURL = (): string => {
+  // Check if we're in browser environment
+  if (typeof window !== "undefined") {
+    // Production check
+    if (process.env.NODE_ENV === "production") {
+      return (
+        process.env.NEXT_PUBLIC_API_BASE_URL || "https://api.7deyedivale.com"
+      );
+    }
+
+    // Development - use localhost with backend port
+    return process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:7700";
+  }
+
+  // Server-side rendering fallback
+  return process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:7700";
+};
+
+const baseURL = getBaseURL();
 const timeout = parseInt(process.env.NEXT_PUBLIC_API_TIMEOUT || "10000", 10);
+
+// Debug log for development
+if (process.env.NODE_ENV !== "production") {
+  console.log("🔗 API Base URL:", baseURL);
+  console.log("🌍 Environment:", process.env.NODE_ENV);
+}
 
 /**
  * Main axios instance for API calls (with auth)

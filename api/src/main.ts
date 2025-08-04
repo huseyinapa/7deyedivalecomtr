@@ -3,9 +3,15 @@ import { AppModule } from "./app.module";
 import { ValidationPipe } from "@nestjs/common";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 import { ConfigService } from "@nestjs/config";
+import { NestExpressApplication } from "@nestjs/platform-express";
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule, {
+    snapshot: true,
+  });
+
+  app.set("trust proxy", true);
+
   const configService = app.get(ConfigService);
 
   // Global validation pipe
@@ -17,15 +23,41 @@ async function bootstrap() {
     })
   );
 
-  // CORS config - Production ready
-  const corsOrigins = process.env.CORS_ORIGIN
-    ? process.env.CORS_ORIGIN.split(",")
-    : ["http://localhost:3000"]; // Fallback for development
+  // CORS config - Production ready with development support
+  const corsOrigins =
+    process.env.NODE_ENV === "production"
+      ? process.env.CORS_ORIGIN.split(",")
+      : [
+          "http://localhost:3000",
+          "http://localhost:3001",
+          "http://localhost:3002",
+          "http://localhost:4000",
+          "http://localhost:5000",
+          "http://127.0.0.1:3000",
+          "http://127.0.0.1:3001",
+        ];
 
   app.enableCors({
-    origin: corsOrigins,
-    methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
-    allowedHeaders: ["Content-Type", "Authorization"],
+    origin: (origin, callback) => {
+      // Allow requests with no origin (like mobile apps or curl requests)
+      if (!origin) return callback(null, true);
+
+      // Check if origin is in allowed list
+      if (corsOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+
+      // Development mode - allow all localhost and 127.0.0.1 requests
+      if (process.env.NODE_ENV !== "production") {
+        if (origin.includes("localhost") || origin.includes("127.0.0.1")) {
+          return callback(null, true);
+        }
+      }
+
+      callback(new Error("Not allowed by CORS"));
+    },
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
     credentials: true,
   });
 
