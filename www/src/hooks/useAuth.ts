@@ -16,16 +16,43 @@ export function useAuth() {
     error,
     isLoading,
     mutate,
-  } = useSWR("/auth/me", () => authService.getCurrentUser(), {
-    revalidateOnFocus: false,
-    shouldRetryOnError: false,
-  });
+  } = useSWR(
+    // Only fetch if token exists
+    authService.isAuthenticated() ? "/auth/me" : null,
+    () => authService.getCurrentUser(),
+    {
+      revalidateOnFocus: false,
+      shouldRetryOnError: (error) => {
+        // Don't retry on 401/403 errors
+        if (
+          error?.response?.status === 401 ||
+          error?.response?.status === 403
+        ) {
+          return false;
+        }
+        return true;
+      },
+      errorRetryCount: 1,
+      errorRetryInterval: 5000,
+      onError: (error) => {
+        // Clear auth data on authentication errors
+        if (
+          error?.response?.status === 401 ||
+          error?.response?.status === 403
+        ) {
+          authService.logout();
+        }
+      },
+    }
+  );
 
   return {
     user,
     isLoading,
     isError: error,
     refresh: mutate,
+    isAdmin: user?.role === "admin",
+    isAuthenticated: !!user,
   };
 }
 
@@ -36,7 +63,34 @@ export function useLogin() {
   const login = async (
     credentials: LoginCredentials
   ): Promise<AuthResponse> => {
-    return await authService.login(credentials);
+    try {
+      const result = await authService.login(credentials);
+
+      // Force refresh of the auth state after successful login
+      // This ensures the user state updates immediately
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(new Event("auth-change"));
+      }
+
+      return result;
+    } catch (error: any) {
+      // Enhanced error handling with better messages
+      if (error?.response?.status === 401) {
+        throw new Error("E-posta veya şifre hatalı");
+      } else if (error?.response?.status === 429) {
+        throw new Error("Çok fazla deneme yaptınız. Lütfen biraz bekleyin");
+      } else if (error?.response?.status === 403) {
+        throw new Error("Hesabınız geçici olarak engellenmiş");
+      } else if (error?.response?.status >= 500) {
+        throw new Error("Sunucu hatası. Lütfen daha sonra tekrar deneyin");
+      } else if (error?.response?.data?.message) {
+        throw new Error(error.response.data.message);
+      } else if (error?.message) {
+        throw error;
+      } else {
+        throw new Error("Giriş yapılırken bir hata oluştu");
+      }
+    }
   };
 
   return { login };

@@ -27,9 +27,17 @@ export class User {
   @Exclude({ toPlainOnly: true })
   password: string;
 
+  @ApiProperty({ description: "User role", enum: ["user", "admin"] })
+  @Column({ default: "user" })
+  role: string;
+
   @ApiProperty({ description: "Is user active" })
   @Column({ default: true })
   isActive: boolean;
+
+  @ApiProperty({ description: "Created by (admin email)", required: false })
+  @Column({ nullable: true })
+  createdBy?: string;
 
   @ApiProperty({ description: "Creation date" })
   @CreateDateColumn()

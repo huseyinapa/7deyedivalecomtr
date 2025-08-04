@@ -8,6 +8,7 @@ import {
   Delete,
   HttpStatus,
   Query,
+  UseGuards,
 } from "@nestjs/common";
 import {
   ApiTags,
@@ -16,11 +17,13 @@ import {
   ApiParam,
   ApiQuery,
 } from "@nestjs/swagger";
+import { Throttle } from "@nestjs/throttler";
 import { CallCourierService } from "./call-courier.service";
 import { CreateCallCourierDto } from "./dto/create-call-courier.dto";
 import { UpdateCallCourierDto } from "./dto/update-call-courier.dto";
 import { CallCourier } from "./entities/call-courier.entity";
 import { Public } from "../auth/decorators/public.decorator";
+import { CallCourierRateLimitGuard } from "../../common/guards/call-courier-rate-limit.guard";
 
 @ApiTags("call-courier")
 @Controller("call-courier")
@@ -29,6 +32,7 @@ export class CallCourierController {
 
   @Post()
   @Public()
+  @UseGuards(CallCourierRateLimitGuard)
   @ApiOperation({ summary: "Create a new courier call request" })
   @ApiResponse({
     status: HttpStatus.CREATED,

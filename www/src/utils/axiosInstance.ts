@@ -23,6 +23,11 @@ export interface ApiError {
   statusCode: number;
   timestamp: string;
   path: string;
+  details?: {
+    usedAttempts?: number;
+    maxAttempts?: number;
+    resetIn?: string;
+  };
 }
 
 /**
@@ -87,19 +92,24 @@ publicAxiosInstance.interceptors.response.use(
       switch (status) {
         case 401:
           // For public endpoints, 401 means the endpoint doesn't exist or server error
-          toast.error("Hizmet şu anda kullanılamıyor");
+          toast.error(data?.message || "Hizmet şu anda kullanılamıyor");
           break;
         case 403:
-          toast.error("Bu işlem için yetkiniz bulunmamaktadır");
+          toast.error(
+            data?.message || "Bu işlem için yetkiniz bulunmamaktadır"
+          );
           break;
         case 404:
-          toast.error("İstenen kaynak bulunamadı");
+          toast.error(data?.message || "İstenen kaynak bulunamadı");
           break;
         case 422:
-          toast.error("Gönderilen veriler hatalı");
+          toast.error(data?.message || "Gönderilen veriler hatalı");
           break;
         case 500:
-          toast.error("Sunucu hatası oluştu. Lütfen daha sonra tekrar deneyin");
+          toast.error(
+            data?.message ||
+              "Sunucu hatası oluştu. Lütfen daha sonra tekrar deneyin"
+          );
           break;
         default:
           toast.error(data?.message || "Bir hata oluştu");
@@ -127,37 +137,97 @@ axiosInstance.interceptors.response.use(
     // Handle common HTTP errors
     if (error.response) {
       const { status, data } = error.response;
+      const url = error.config?.url || "";
 
       switch (status) {
         case 401:
-          // Unauthorized - clear token and redirect to login
+          // Don't show toast or clear auth for login endpoint - let the component handle it
+          if (url.includes("/auth/login")) {
+            // Just pass the error through for login attempts
+            break;
+          }
+
+          // Unauthorized - clear token and redirect to login for other endpoints
+          if (data?.message) {
+            toast.error(data.message);
+          }
           localStorage.removeItem("token");
           localStorage.removeItem("user");
+          // Clear cookies too
+          document.cookie =
+            "token=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/;";
+          document.cookie =
+            "user=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/;";
           if (typeof window !== "undefined") {
             window.location.href = "/admin/login";
           }
           break;
         case 403:
-          toast.error("Bu işlem için yetkiniz bulunmamaktadır");
+          // Don't show toast for login endpoint - let the component handle it
+          if (!url.includes("/auth/login")) {
+            toast.error(
+              data?.message || "Bu işlem için yetkiniz bulunmamaktadır"
+            );
+          }
           break;
         case 404:
-          toast.error("İstenen kaynak bulunamadı");
+          // Don't show toast for login endpoint
+          if (!url.includes("/auth/login")) {
+            toast.error(data?.message || "İstenen kaynak bulunamadı");
+          }
           break;
         case 422:
-          toast.error("Gönderilen veriler hatalı");
+          // Don't show toast for login endpoint
+          if (!url.includes("/auth/login")) {
+            toast.error(data?.message || "Gönderilen veriler hatalı");
+          }
+          break;
+        case 423:
+          // Account locked
+          toast.error(
+            data?.message ||
+              "Hesabınız geçici olarak kilitlenmiştir. Lütfen daha sonra tekrar deneyin"
+          );
+          break;
+        case 429:
+          // Rate limited - don't show toast for login endpoint
+          if (!url.includes("/auth/login")) {
+            const rateLimitMessage =
+              data?.message ||
+              "Çok fazla istek gönderdiniz. Lütfen biraz bekleyip tekrar deneyin";
+            toast.error(rateLimitMessage, { duration: 6000 }); // Longer duration for rate limit messages
+
+            // Log details for debugging
+            if (data?.details) {
+              console.log("Rate limit details:", data.details);
+            }
+          }
           break;
         case 500:
-          toast.error("Sunucu hatası oluştu. Lütfen daha sonra tekrar deneyin");
+          // Don't show toast for login endpoint
+          if (!url.includes("/auth/login")) {
+            toast.error(
+              data?.message ||
+                "Sunucu hatası oluştu. Lütfen daha sonra tekrar deneyin"
+            );
+          }
           break;
         default:
-          toast.error(data?.message || "Bir hata oluştu");
+          // Don't show toast for login endpoint
+          if (!url.includes("/auth/login")) {
+            toast.error(data?.message || "Bir hata oluştu");
+          }
       }
     } else if (error.request) {
-      // Network error
-      toast.error("Bağlantı hatası. İnternet bağlantınızı kontrol edin");
+      // Network error - don't show for login endpoint
+      if (!error.config?.url?.includes("/auth/login")) {
+        toast.error("Bağlantı hatası. İnternet bağlantınızı kontrol edin");
+      }
     } else {
-      // Other errors
-      toast.error("Beklenmeyen bir hata oluştu");
+      // Other errors - don't show for login endpoint
+      if (!error.config?.url?.includes("/auth/login")) {
+        toast.error("Beklenmeyen bir hata oluştu");
+      }
     }
 
     return Promise.reject(error);

@@ -4,6 +4,8 @@ import { useState, useEffect } from "react";
 import toast, { Toaster } from "react-hot-toast";
 import uid from "@/utils/uid";
 import { useCallCourierMutations } from "@/hooks/useCallCourier";
+import { useRateLimit } from "@/hooks/useRateLimit";
+import { RateLimitWarning } from "@/components/ui/RateLimitWarning";
 import { SenderInfo, ReceiverInfo, PackageDetails as PackageDetailsType } from "@/types/courier/call";
 import { ValidationResult } from "@/types";
 import { PackageDetails } from "./components/packageDetails";
@@ -11,6 +13,12 @@ import AddressSelector from "./components/AddressSelector";
 
 export default function PackageForm() {
   const { createCallCourier } = useCallCourierMutations();
+  const {
+    rateLimitInfo,
+    handleRateLimitError,
+    clearRateLimit,
+    showRateLimitWarning
+  } = useRateLimit();
 
   const initialSenderInfo: SenderInfo = {
     name: "",
@@ -162,10 +170,17 @@ export default function PackageForm() {
         setSenderInfo(initialSenderInfo);
         setReceiverInfo(initialReceiverInfo);
         setPackageDetails(initialPackageDetails);
+        clearRateLimit(); // Rate limit durumunu temizle
       }
     } catch (error: any) {
       console.error("Call courier error:", error);
-      toast.error(error?.response?.data?.message || "Kurye çağırma işleminde hata oluştu");
+
+      // Rate limiting error handling
+      if (error?.response?.status === 429) {
+        handleRateLimitError(error);
+      } else {
+        toast.error(error?.response?.data?.message || "Kurye çağırma işleminde hata oluştu");
+      }
     }
   };
 
@@ -209,6 +224,11 @@ export default function PackageForm() {
           onSubmit={handleSubmit}
         >
           <h2 className="text-2xl font-bold">Kurye Çağır</h2>
+
+          {/* Rate Limit Warning */}
+          {rateLimitInfo.isLimited && (
+            <RateLimitWarning rateLimitInfo={rateLimitInfo} />
+          )}
 
           <div className="border-b border-gray-300 font-semibold text-lg text-[#333] pb-2 mb-4">
             Gönderici Bilgileri
@@ -344,9 +364,13 @@ export default function PackageForm() {
           />
           <button
             type="submit"
-            className="w-full bg-[#333] text-white p-2 rounded-3xl mt-4 px-4 py-2 font-medium transition-colors hover:bg-gray-700"
+            disabled={rateLimitInfo.isLimited}
+            className={`w-full p-2 rounded-3xl mt-4 px-4 py-2 font-medium transition-colors ${rateLimitInfo.isLimited
+                ? 'bg-gray-400 text-gray-600 cursor-not-allowed'
+                : 'bg-[#333] text-white hover:bg-gray-700'
+              }`}
           >
-            Gönder
+            {rateLimitInfo.isLimited ? 'Geçici olarak kısıtlandı' : 'Gönder'}
           </button>
         </form>
         {isAddressSelectorOpen && (

@@ -4,12 +4,15 @@ import { TypeOrmModule } from "@nestjs/typeorm";
 import { APP_GUARD, APP_FILTER, APP_INTERCEPTOR } from "@nestjs/core";
 import { AuthModule } from "./modules/auth/auth.module";
 import { UsersModule } from "./modules/users/users.module";
+import { AdminModule } from "./modules/admin/admin.module";
+import { HealthModule } from "./modules/health/health.module";
 import { CourierApplicationModule } from "./modules/courier-application/courier-application.module";
 import { CallCourierModule } from "./modules/call-courier/call-courier.module";
 import { CourierServiceModule } from "./modules/courier-service/courier-service.module";
 import { JwtAuthGuard } from "./modules/auth/guards/jwt-auth.guard";
 import { GlobalExceptionFilter } from "./common/filters/global-exception.filter";
 import { TransformInterceptor } from "./common/interceptors/transform.interceptor";
+import { SecurityInterceptor } from "./common/interceptors/security.interceptor";
 import { DatabaseModule } from "./database/database.module";
 import { DatabaseService } from "./database/database.service";
 import databaseConfig from "./config/database.config";
@@ -39,8 +42,8 @@ import { Request } from "express";
         },
         throttlers: [
           {
-            ttl: 60000,
-            limit: 10,
+            ttl: 60000, // 60 seconds
+            limit: 50, // 50 requests per minute (more reasonable)
           },
         ],
       }),
@@ -53,6 +56,8 @@ import { Request } from "express";
     }),
     AuthModule,
     UsersModule,
+    AdminModule,
+    HealthModule,
     CourierApplicationModule,
     CallCourierModule,
     CourierServiceModule,
@@ -71,6 +76,10 @@ import { Request } from "express";
     {
       provide: APP_FILTER,
       useClass: GlobalExceptionFilter,
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: SecurityInterceptor,
     },
     {
       provide: APP_INTERCEPTOR,

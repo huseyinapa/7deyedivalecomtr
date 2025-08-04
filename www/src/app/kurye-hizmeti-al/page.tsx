@@ -6,6 +6,8 @@ import toast, { Toaster } from "react-hot-toast";
 import ContactInformation from "./components/contactInfo";
 import CompanyInformation from "./components/companyInfo";
 import { useCourierServiceMutations } from "@/hooks/useCourierService";
+import { useRateLimit } from "@/hooks/useRateLimit";
+import { RateLimitWarning } from "@/components/ui/RateLimitWarning";
 import { CreateCourierServiceDto } from "@/lib/api";
 
 interface ServiceContactInfo {
@@ -40,6 +42,12 @@ interface ValidationResult {
 
 export default function Page(): JSX.Element {
   const { createService } = useCourierServiceMutations();
+  const {
+    rateLimitInfo,
+    handleRateLimitError,
+    clearRateLimit,
+    showRateLimitWarning
+  } = useRateLimit();
 
   const initialFormData: ServiceFormData = {
     contactInfo: {
@@ -130,10 +138,17 @@ export default function Page(): JSX.Element {
 
         toast.success("Başvurunuz başarıyla gönderildi!");
         setFormData(initialFormData);
+        clearRateLimit(); // Rate limit durumunu temizle
         console.log("Service created:", result);
       } catch (error: any) {
         console.error("Service creation error:", error);
-        toast.error(error.message || "Bir hata oluştu. Lütfen tekrar deneyin.");
+
+        // Rate limiting error handling
+        if (error?.response?.status === 429) {
+          handleRateLimitError(error);
+        } else {
+          toast.error(error.message || "Bir hata oluştu. Lütfen tekrar deneyin.");
+        }
       }
     } else {
       toast.error(validation.reason);
@@ -168,13 +183,24 @@ export default function Page(): JSX.Element {
         onSubmit={handleSubmit}
         className="flex flex-col justify-center items-center w-[100%] py-12 gap-14"
       >
+        {/* Rate Limit Warning */}
+        {rateLimitInfo.isLimited && (
+          <div className="w-full max-w-md">
+            <RateLimitWarning rateLimitInfo={rateLimitInfo} />
+          </div>
+        )}
+
         <ContactInformation onChange={(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => handleChange(e, "contactInfo")} />
         <CompanyInformation onChange={(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => handleChange(e, "companyInfo")} />
         <button
           type="submit"
-          className="w-52 lg:w-[20%] xl:w-[21%] 2xl:w-[22%] min-[2000px]:w-[450px] bg-[#333] text-white rounded-3xl px-4 py-2 font-medium transition-colors hover:bg-gray-700"
+          disabled={rateLimitInfo.isLimited}
+          className={`w-52 lg:w-[20%] xl:w-[21%] 2xl:w-[22%] min-[2000px]:w-[450px] rounded-3xl px-4 py-2 font-medium transition-colors ${rateLimitInfo.isLimited
+              ? 'bg-gray-400 text-gray-600 cursor-not-allowed'
+              : 'bg-[#333] text-white hover:bg-gray-700'
+            }`}
         >
-          Başvuruyu Gönder
+          {rateLimitInfo.isLimited ? 'Geçici olarak kısıtlandı' : 'Başvuruyu Gönder'}
         </button>
       </form>
     </div>

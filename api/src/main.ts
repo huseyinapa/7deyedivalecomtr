@@ -17,8 +17,17 @@ async function bootstrap() {
     })
   );
 
-  // CORS config
-  app.enableCors();
+  // CORS config - Production ready
+  const corsOrigins = process.env.CORS_ORIGIN
+    ? process.env.CORS_ORIGIN.split(",")
+    : ["http://localhost:3000"]; // Fallback for development
+
+  app.enableCors({
+    origin: corsOrigins,
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true,
+  });
 
   // Swagger API documentation
   const config = new DocumentBuilder()
@@ -46,7 +55,7 @@ async function bootstrap() {
   SwaggerModule.setup("api/docs", app, document);
 
   // Start the application
-  const port = configService.get<number>("PORT", 3000);
+  const port = configService.get<number>("PORT", 7700);
   await app.listen(port);
   console.log(`Application is running on: ${await app.getUrl()}`);
 }

@@ -8,6 +8,7 @@ import {
   Delete,
   HttpStatus,
   Query,
+  UseGuards,
 } from "@nestjs/common";
 import {
   ApiTags,
@@ -16,6 +17,7 @@ import {
   ApiParam,
   ApiQuery,
 } from "@nestjs/swagger";
+import { Throttle } from "@nestjs/throttler";
 import { CourierServiceService } from "./courier-service.service";
 import { CreateCourierServiceDto } from "./dto/create-courier-service.dto";
 import { UpdateCourierServiceDto } from "./dto/update-courier-service.dto";
@@ -29,6 +31,7 @@ export class CourierServiceController {
 
   @Post()
   @Public()
+  @Throttle({ default: { limit: 5, ttl: 300000 } }) // 5 requests per 5 minutes
   @ApiOperation({ summary: "Create a new courier service" })
   @ApiResponse({
     status: HttpStatus.CREATED,

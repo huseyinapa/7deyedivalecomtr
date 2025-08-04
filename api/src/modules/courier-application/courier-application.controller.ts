@@ -8,6 +8,7 @@ import {
   Delete,
   HttpStatus,
   Query,
+  UseGuards,
 } from "@nestjs/common";
 import {
   ApiTags,
@@ -16,11 +17,13 @@ import {
   ApiParam,
   ApiQuery,
 } from "@nestjs/swagger";
+import { Throttle } from "@nestjs/throttler";
 import { CourierApplicationService } from "./courier-application.service";
 import { CreateCourierApplicationDto } from "./dto/create-courier-application.dto";
 import { UpdateCourierApplicationDto } from "./dto/update-courier-application.dto";
 import { CourierApplication } from "./entities/courier-application.entity";
 import { Public } from "../auth/decorators/public.decorator";
+import { EmailRateLimitGuard } from "../../common/guards/email-rate-limit.guard";
 
 @ApiTags("courier-application")
 @Controller("courier-application")
@@ -31,6 +34,7 @@ export class CourierApplicationController {
 
   @Post()
   @Public()
+  @UseGuards(EmailRateLimitGuard)
   @ApiOperation({ summary: "Create a new courier application" })
   @ApiResponse({
     status: HttpStatus.CREATED,

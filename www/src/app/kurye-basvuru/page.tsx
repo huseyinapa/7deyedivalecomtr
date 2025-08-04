@@ -10,10 +10,18 @@ import JobExperience from "./components/jobExperience";
 import Notes from "./components/notes";
 import uid from "@/utils/uid";
 import { useCourierApplicationMutations } from "@/hooks/useCourierApplication";
+import { useRateLimit } from "@/hooks/useRateLimit";
+import { RateLimitWarning } from "@/components/ui/RateLimitWarning";
 import { ApplicationData, ValidationResult } from "@/types";
 
 export default function Page(): JSX.Element {
   const { createApplication } = useCourierApplicationMutations();
+  const {
+    rateLimitInfo,
+    handleRateLimitError,
+    clearRateLimit,
+    showRateLimitWarning
+  } = useRateLimit();
 
   const initialApplicationData: ApplicationData = {
     applicationType: {
@@ -178,12 +186,19 @@ export default function Page(): JSX.Element {
         toast.success(validation.reason);
         // Reset form
         setApplicationData(initialApplicationData);
+        clearRateLimit(); // Rate limit durumunu temizle
       } else {
         toast.error("Başvuru gönderilirken bir hata oluştu");
       }
     } catch (error: any) {
       console.error("Başvuru hatası:", error);
-      toast.error(error?.response?.data?.message || "Başvuru gönderilirken bir hata oluştu");
+
+      // Rate limiting error handling
+      if (error?.response?.status === 429) {
+        handleRateLimitError(error);
+      } else {
+        toast.error(error?.response?.data?.message || "Başvuru gönderilirken bir hata oluştu");
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -209,6 +224,13 @@ export default function Page(): JSX.Element {
         onSubmit={handleSubmit}
         className="flex flex-col justify-center items-center w-[100%] py-12 gap-14"
       >
+        {/* Rate Limit Warning */}
+        {rateLimitInfo.isLimited && (
+          <div className="w-full max-w-md">
+            <RateLimitWarning rateLimitInfo={rateLimitInfo} />
+          </div>
+        )}
+
         <ApplicationType
           applicationData={applicationData}
           setApplicationData={setApplicationData}
@@ -232,13 +254,18 @@ export default function Page(): JSX.Element {
         />
         <button
           type="submit"
-          disabled={isSubmitting}
-          className={`w-52 lg:w-[20%] xl:w-[21%] 2xl:w-[22%] min-[2000px]:w-[450px] text-white rounded-3xl px-4 py-2 font-medium transition-colors ${isSubmitting
-            ? 'bg-gray-400 cursor-not-allowed'
-            : 'bg-[#333] hover:bg-gray-700'
+          disabled={isSubmitting || rateLimitInfo.isLimited}
+          className={`w-52 lg:w-[20%] xl:w-[21%] 2xl:w-[22%] min-[2000px]:w-[450px] text-white rounded-3xl px-4 py-2 font-medium transition-colors ${isSubmitting || rateLimitInfo.isLimited
+              ? 'bg-gray-400 cursor-not-allowed'
+              : 'bg-[#333] hover:bg-gray-700'
             }`}
         >
-          {isSubmitting ? 'Gönderiliyor...' : 'Başvur'}
+          {isSubmitting
+            ? 'Gönderiliyor...'
+            : rateLimitInfo.isLimited
+              ? 'Geçici olarak kısıtlandı'
+              : 'Başvur'
+          }
         </button>
       </form>
     </div>

@@ -11,8 +11,8 @@ const {
   DB_HOST = "localhost",
   DB_PORT = 5432,
   DB_USERNAME = "postgres",
-  DB_PASSWORD = "postgres",
-  DB_DATABASE = "yedi_api",
+  DB_PASSWORD = "yedi",
+  DB_DATABASE = "yedi_db",
 } = process.env;
 
 // Create a new data source

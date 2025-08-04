@@ -1,10 +1,14 @@
 {
   "name": "yedi-api-nest",
-  "version": "0.0.1",
-  "description": "NestJS API project",
-  "author": "",
+  "version": "1.0.0",
+  "description": "7de Yedi Vale - Kurye API",
+  "author": "7de Yedi Vale",
   "private": true,
   "license": "UNLICENSED",
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  },
   "scripts": {
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
