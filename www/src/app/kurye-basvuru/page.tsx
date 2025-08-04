@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
+import Image from "next/image";
 import toast, { Toaster } from "react-hot-toast";
 
 import ApplicationType from "./components/applicationType";
@@ -214,10 +215,13 @@ export default function Page(): JSX.Element {
         <div className="text-lg font-medium ml-8">
           Kurye ihtiyaçlarınız için formu doldurun gerisini bize bırakın :)
         </div>
-        <img
+        <Image
           src="/assets/motor.png"
           className="absolute bottom-0 right-80 h-[150px] object-contain"
-          alt="Motor"
+          alt="Motor kurye"
+          width={150}
+          height={150}
+          loading="lazy"
         />
       </div>
       <form

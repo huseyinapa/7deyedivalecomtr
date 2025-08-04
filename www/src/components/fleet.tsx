@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 export default function Fleet() {
   return (
     <div className="mt-10 w-full bg-white">
@@ -20,7 +22,14 @@ export default function Fleet() {
         <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 justify-center place-items-center md:h-auto xl:h-[350px] gap-7">
           {/* Arac karti 1 */}
           <div className="flex flex-col w-52 m-3 items-center justify-center gap-3">
-            <img src="/assets/tesla.png" className="w-16 md:w-20 lg:w-28" />
+            <Image
+              src="/assets/tesla.png"
+              className="w-20 md:w-24 lg:w-32 h-20 md:h-24 lg:h-32 object-contain"
+              alt="Tesla araç"
+              width={128}
+              height={128}
+              loading="lazy"
+            />
             <div className="flex flex-col items-center gap-1">
               <h1 className="text-xl font-bold text-white opacity-70">Araç Kurye</h1>
               <a className="font-medium text-white text-sm text-center opacity-45">
@@ -30,7 +39,14 @@ export default function Fleet() {
           </div>
           {/* Arac karti 2 */}
           <div className="flex flex-col w-52 m-3 items-center justify-center gap-3 ">
-            <img src="/assets/scooter.png" className="w-16 md:w-20 lg:w-28" />
+            <Image
+              src="/assets/scooter.png"
+              className="w-20 md:w-24 lg:w-32 h-20 md:h-24 lg:h-32 object-contain"
+              alt="Scooter"
+              width={128}
+              height={128}
+              loading="lazy"
+            />
             <div className="flex flex-col items-center gap-1">
               <h1 className="text-xl font-bold text-white opacity-70">Moto Kurye</h1>
               <a className="font-medium text-white text-sm text-center opacity-45">
@@ -41,7 +57,14 @@ export default function Fleet() {
           </div>
           {/* Arac karti 3 */}
           <div className="flex flex-col w-52 m-3 items-center justify-center gap-3 ">
-            <img src="/assets/bike.png" className="w-16 md:w-20 lg:w-28" />
+            <Image
+              src="/assets/bike.png"
+              className="w-20 md:w-24 lg:w-32 h-20 md:h-24 lg:h-32 object-contain"
+              alt="Bisiklet"
+              width={128}
+              height={128}
+              loading="lazy"
+            />
             <div className="flex flex-col items-center gap-1">
               <h1 className="text-xl font-bold text-white opacity-70">
                 Bisiklet Kurye
@@ -54,7 +77,14 @@ export default function Fleet() {
           </div>
           {/* Arac karti 4 */}
           <div className="flex flex-col w-52 m-3 items-center justify-center gap-3 ">
-            <img src="/assets/kick_scooter.png" className="w-16 md:w-20 lg:w-28" />
+            <Image
+              src="/assets/kick_scooter.png"
+              className="w-20 md:w-24 lg:w-32 h-20 md:h-24 lg:h-32 object-contain"
+              alt="Kick scooter"
+              width={128}
+              height={128}
+              loading="lazy"
+            />
             <div className="flex flex-col items-center gap-1">
               <h1 className="text-xl font-bold text-white opacity-70">
                 Scooter Kurye
@@ -67,7 +97,14 @@ export default function Fleet() {
           </div>
           {/* Arac karti 5 */}
           <div className="flex flex-col w-52 m-3 items-center justify-center gap-3 ">
-            <img src="/assets/walking.png" className="w-16 md:w-20 lg:w-28" />
+            <Image
+              src="/assets/walking.png"
+              className="w-20 md:w-24 lg:w-32 h-20 md:h-24 lg:h-32 object-contain"
+              alt="Yaya kurye"
+              width={128}
+              height={128}
+              loading="lazy"
+            />
             <div className="flex flex-col items-center gap-1">
               <h1 className="text-xl font-bold text-white opacity-70">Yaya Kurye</h1>
               <a className="font-medium text-white text-sm text-center opacity-45">

@@ -1,10 +1,17 @@
+import Image from "next/image";
+
 export default function CallCourier() {
   return (
     <div className="mx-auto flex flex-col md:flex-row mt-8 md:p-6 sm:p-9 md:px-5 sm:px-9 items-center md:justify-center xl:justify-around gap-2 md:gap-7 lg:gap-10 w-[90%] md:w-[97%] lg:w-[92%] xl:w-[85%] h-[600px] md:h-[400px] lg:h-[470px] xl:h-[530px]">
       <div>
-        <img
+        <Image
           className="w-[700px] md:w-[700px] lg:w-[600px] h-[200px] md:h-[250px] lg:h-[250px] object-contain lg:object-cover"
           src="/assets/araba.png"
+          alt="Kurye arabası"
+          width={700}
+          height={250}
+          sizes="(max-width: 768px) 700px, (max-width: 1024px) 700px, 600px"
+          loading="lazy"
         />
       </div>
       <div className="flex flex-col justify-center p-3 md:p-6 md:pl-9 gap-8 md:gap-3 w-[97%] md:w-[94%] lg:w-[87%] xl:w-[55%]">

@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Footer from "@/components/layout/footer";
 import Header from "@/components/layout/header";
 
@@ -30,9 +31,13 @@ export default function Services() {
           <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 justify-center place-items-center md:h-auto xl:h-[350px] gap-7">
             {/* Arac karti 1 */}
             <div className="flex flex-col w-52 m-3 items-center justify-center gap-3">
-              <img
-                src="assets/tesla_back.png"
+              <Image
+                src="/assets/tesla_back.png"
                 className="w-16 md:w-20 lg:w-28 opacity-80"
+                alt="Tesla araç kurye"
+                width={112}
+                height={112}
+                loading="lazy"
               />
               <div className="flex flex-col items-center gap-1">
                 <h1 className="text-2xl font-bold text-[#333] opacity-90">
@@ -45,9 +50,13 @@ export default function Services() {
             </div>
             {/* Arac karti 2 */}
             <div className="flex flex-col w-52 m-3 items-center justify-center gap-3 ">
-              <img
-                src="assets/scooter_back.png"
+              <Image
+                src="/assets/scooter_back.png"
                 className="w-16 md:w-20 lg:w-28 opacity-80"
+                alt="Scooter kurye"
+                width={112}
+                height={112}
+                loading="lazy"
               />
               <div className="flex flex-col items-center gap-1">
                 <h1 className="text-2xl font-bold text-[#333] opacity-90">
@@ -61,9 +70,13 @@ export default function Services() {
             </div>
             {/* Arac karti 3 */}
             <div className="flex flex-col w-52 m-3 items-center justify-center gap-3 ">
-              <img
-                src="assets/bike_back.png"
+              <Image
+                src="/assets/bike_back.png"
                 className="w-16 md:w-20 lg:w-28 opacity-80"
+                alt="Bisiklet kurye"
+                width={112}
+                height={112}
+                loading="lazy"
               />
               <div className="flex flex-col items-center gap-1">
                 <h1 className="text-2xl font-bold text-[#333] opacity-90">
@@ -77,9 +90,13 @@ export default function Services() {
             </div>
             {/* Arac karti 4 */}
             <div className="flex flex-col w-52 m-3 items-center justify-center gap-3 ">
-              <img
-                src="assets/kick_scooter_back.png"
+              <Image
+                src="/assets/kick_scooter_back.png"
                 className="w-16 md:w-20 lg:w-28 opacity-80"
+                alt="Kick scooter kurye"
+                width={112}
+                height={112}
+                loading="lazy"
               />
               <div className="flex flex-col items-center gap-1">
                 <h1 className="text-2xl font-bold text-[#333] opacity-90">
@@ -93,9 +110,13 @@ export default function Services() {
             </div>
             {/* Arac karti 5 */}
             <div className="flex flex-col w-52 m-3 items-center justify-center gap-3 ">
-              <img
-                src="assets/walking_back.png"
+              <Image
+                src="/assets/walking_back.png"
                 className="w-16 md:w-20 lg:w-28 opacity-80"
+                alt="Yaya kurye"
+                width={112}
+                height={112}
+                loading="lazy"
               />
               <div className="flex flex-col items-center gap-1">
                 <h1 className="text-2xl font-bold text-[#333] opacity-90">

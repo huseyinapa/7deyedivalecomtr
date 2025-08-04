@@ -1,5 +1,5 @@
 import Image from "next/image";
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 
 export default function Carousel() {
   const images = [
@@ -28,6 +28,15 @@ export default function Carousel() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
+  const startInterval = useCallback(() => {
+    if (intervalRef.current !== null) {
+      clearInterval(intervalRef.current);
+    }
+    intervalRef.current = setInterval(() => {
+      setCurrentIndex((prevIndex) => (prevIndex + 1) % images.length);
+    }, 6000);
+  }, [images.length]);
+
   useEffect(() => {
     startInterval();
     return () => {
@@ -35,33 +44,29 @@ export default function Carousel() {
         clearInterval(intervalRef.current);
       }
     };
-  }, []);
+  }, [startInterval]);
 
-  const startInterval = () => {
-    if (intervalRef.current !== null) {
-      clearInterval(intervalRef.current);
-    }
-    intervalRef.current = setInterval(() => {
-      setCurrentIndex((prevIndex) => (prevIndex + 1) % images.length);
-    }, 6000);
-  };
-
-  const handlePrev = () => {
+  const handlePrev = useCallback(() => {
     setCurrentIndex((prevIndex) =>
       prevIndex === 0 ? images.length - 1 : prevIndex - 1
     );
     startInterval();
-  };
+  }, [images.length, startInterval]);
 
-  const handleNext = () => {
+  const handleNext = useCallback(() => {
     setCurrentIndex((prevIndex) => (prevIndex + 1) % images.length);
     startInterval();
-  };
+  }, [images.length, startInterval]);
+
+  const handleIndicatorClick = useCallback((index: number) => {
+    setCurrentIndex(index);
+    startInterval();
+  }, [startInterval]);
 
   return (
     <div className="max-w-screen mx-auto bg-[#333]">
       <div id="default-carousel" className="relative" data-carousel="static">
-        <div className="overflow-hidden relative h-[210px] sm:h-[440px] xl:h-[510px] 2xl:h-[570px]">
+        <div className="overflow-hidden relative h-[210px] sm:h-[440px] xl:h-[650px] 2xl:h-[700px]">
           {images.map((image, index) => (
             <div
               key={index}
@@ -75,9 +80,11 @@ export default function Carousel() {
                   "top-1/2 left-1/2 -translate-x-1/2 -translate-y-2/4"
                   }`}
                 alt={image.alt}
-                priority={index === currentIndex}
+                priority={index === 0}
+                loading={index === 0 ? "eager" : "lazy"}
                 width={1260}
                 height={800}
+                sizes="100vw"
               />
             </div>
           ))}
@@ -91,10 +98,7 @@ export default function Carousel() {
                 }`}
               aria-current={currentIndex === index ? "true" : "false"}
               aria-label={`Slide ${index + 1}`}
-              onClick={() => {
-                setCurrentIndex(index);
-                startInterval();
-              }}
+              onClick={() => handleIndicatorClick(index)}
             />
           ))}
         </div>

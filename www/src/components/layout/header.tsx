@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import ThemeToggle from "../themeToggle";
 
@@ -10,6 +10,8 @@ export default function Header() {
   const router = useRouter();
 
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 0 ? true : false);
@@ -21,6 +23,23 @@ export default function Header() {
     };
   }, []);
 
+  const toggleMenu = () => {
+    setIsMenuOpen((prev) => !prev);
+  };
+
+  const handleClickOutside = (event: MouseEvent) => {
+    if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+      setIsMenuOpen(false);
+    }
+  };
+
+  useEffect(() => {
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
   const navItems = (name: string, href: string) => (
     <a
       href={href}
@@ -28,8 +47,7 @@ export default function Header() {
     >
       {name}
     </a>
-
-  )
+  );
 
   return (
     <header
@@ -44,6 +62,8 @@ export default function Header() {
             alt="7de Yedi Vale Logo"
             width={400}
             height={100}
+            priority
+            sizes="(max-width: 768px) 400px, (max-width: 1024px) 270px, 270px"
           />
         </a>
 
@@ -58,17 +78,18 @@ export default function Header() {
             href="/kurye-cagir"
             className="px-6 py-3 w-[180px] border-4 border-black bg-[#333] text-white rounded-full font-semibold hover:bg-gray-800 transition-colors text-center"
           >
-            Hemen Kurye Çağır!
+            Kurye Çağır!
           </a>
           {/* <ThemeToggle /> */}
         </div>
 
         <div className="flex md:hidden items-center">
-          <div className="relative">
+          <div className="relative" ref={menuRef}>
             <div
               tabIndex={0}
               role="button"
               className="px-4 py-2 bg-white border-4 border-black rounded-full lg:hidden cursor-pointer hover:bg-gray-100 transition-colors"
+              onClick={toggleMenu}
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -85,53 +106,65 @@ export default function Header() {
                 />
               </svg>
             </div>
-            <ul className="absolute right-0 top-12 z-50 p-2 gap-2 shadow-lg bg-white rounded-lg w-52 border border-gray-200 hidden group-hover:block">
-              <li>
-                <button
-                  className="w-full px-4 py-2 text-sm border-2 border-black bg-[#333] text-white rounded-full hover:bg-gray-800 transition-colors"
-                  onClick={() => {
-                    router.push("/kurye-cagir");
-                  }}
-                >
-                  Kurye Çağır!
-                </button>
-              </li>
-              <li>
-                <button
-                  className="w-full px-4 py-2 text-sm border-2 border-black text-[#333] bg-white rounded-full hover:bg-gray-100 transition-colors"
-                  onClick={() => {
-                    router.push("/hizmetlerimiz");
-                  }}
-                >
-                  Hizmetlerimiz
-                </button>
-              </li>
-              <li>
-                <button
-                  className="w-full px-4 py-2 text-sm border-2 border-black text-[#333] bg-white rounded-full hover:bg-gray-100 transition-colors"
-                  onClick={() => {
-                    router.push("/kurye-hizmeti-al");
-                  }}
-                >
-                  Kurye Hizmeti Al
-                </button>
-              </li>
-              <li>
-                <button
-                  className="w-full px-4 py-2 text-sm border-2 border-black text-[#333] bg-white rounded-full hover:bg-gray-100 transition-colors"
-                  onClick={() => {
-                    router.push("/kurye-basvuru");
-                  }}
-                >
-                  Kurye Ol
-                </button>
-              </li>
-            </ul>
+            {isMenuOpen && (
+              <ul
+                className="absolute right-0 top-12 z-50 p-2 shadow-lg bg-white rounded-lg w-48 border border-gray-200 transition-all duration-300 ease-in-out transform opacity-0 scale-95"
+                style={{
+                  opacity: isMenuOpen ? 1 : 0,
+                  transform: isMenuOpen ? "scale(1)" : "scale(0.95)",
+                }}
+              >
+                <li className="mb-2">
+                  <button
+                    className="w-full px-3 py-1.5 text-sm border-2 border-black bg-[#333] text-white rounded-full hover:bg-gray-800 transition-colors"
+                    onClick={() => {
+                      router.push("/kurye-cagir");
+                      setIsMenuOpen(false);
+                    }}
+                  >
+                    Kurye Çağır!
+                  </button>
+                </li>
+                <li className="mb-2">
+                  <button
+                    className="w-full px-3 py-1.5 text-sm border-2 border-black text-[#333] bg-white rounded-full hover:bg-gray-100 transition-colors"
+                    onClick={() => {
+                      router.push("/hizmetlerimiz");
+                      setIsMenuOpen(false);
+                    }}
+                  >
+                    Hizmetlerimiz
+                  </button>
+                </li>
+                <li className="mb-2">
+                  <button
+                    className="w-full px-3 py-1.5 text-sm border-2 border-black text-[#333] bg-white rounded-full hover:bg-gray-100 transition-colors"
+                    onClick={() => {
+                      router.push("/kurye-hizmeti-al");
+                      setIsMenuOpen(false);
+                    }}
+                  >
+                    Kurye Hizmeti Al
+                  </button>
+                </li>
+                <li>
+                  <button
+                    className="w-full px-3 py-1.5 text-sm border-2 border-black text-[#333] bg-white rounded-full hover:bg-gray-100 transition-colors"
+                    onClick={() => {
+                      router.push("/kurye-basvuru");
+                      setIsMenuOpen(false);
+                    }}
+                  >
+                    Kurye Ol
+                  </button>
+                </li>
+              </ul>
+            )}
           </div>
         </div>
       </div>
       <div className="flex flex-col gap-2">
-        <img src="/assets/line1.svg" />
+        <img className="translate-x-0" src="/assets/line1.svg" />
         <img className="-translate-x-5" src="/assets/line1.svg" />
       </div>
     </header>

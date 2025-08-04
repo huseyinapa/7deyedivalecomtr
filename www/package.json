@@ -7,11 +7,14 @@
     "npm": ">=9.0.0"
   },
   "scripts": {
-    "predev": "rd /s /q .next || next dev",
-    "dev": "next dev",
+    "predev": "rd /s /q .next 2>nul || true",
+    "dev": "next dev --turbo",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "lint:fix": "next lint --fix",
+    "type-check": "tsc --noEmit",
+    "analyze": "cross-env ANALYZE=true npm run build"
   },
   "dependencies": {
     "@heroicons/react": "^2.2.0",
@@ -62,6 +65,7 @@
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
     "autoprefixer": "^10.4.21",
+    "cross-env": "^7.0.3",
     "eslint": "8.57.1",
     "eslint-config-next": "15.4.5",
     "postcss": "^8.4.38",

@@ -27,6 +27,7 @@ import { RolesGuard } from "../auth/guards/roles.guard";
 import { Roles } from "../auth/decorators/roles.decorator";
 import { CourierApplicationService } from "../courier-application/courier-application.service";
 import { Like, In } from "typeorm";
+import * as os from "os";
 
 @ApiTags("admin")
 @Controller("admin")
@@ -144,8 +145,23 @@ export class AdminController {
       (memoryUsage.heapUsed / (1024 * 1024 * 1024)) * 100
     );
 
-    // Simulate CPU usage (in production, you might use a library like 'os-utils')
-    const cpuUsage = Math.floor(Math.random() * 30) + 10; // Simulated CPU usage between 10-40%
+    const cpuUsage = await new Promise<number>((resolve) => {
+      const startTime = process.hrtime();
+      const startUsage = process.cpuUsage();
+
+      setTimeout(() => {
+        const elapsedTime = process.hrtime(startTime);
+        const elapsedUsage = process.cpuUsage(startUsage);
+
+        const elapsedTimeMs = elapsedTime[0] * 1000 + elapsedTime[1] / 1e6;
+        const elapsedUserMs = elapsedUsage.user / 1000;
+        const elapsedSystemMs = elapsedUsage.system / 1000;
+
+        const cpuPercent =
+          ((elapsedUserMs + elapsedSystemMs) / elapsedTimeMs) * 100;
+        resolve(cpuPercent);
+      }, 100);
+    });
 
     // Determine overall system status
     let systemStatus: "healthy" | "warning" | "critical" = "healthy";
@@ -175,11 +191,11 @@ export class AdminController {
         services: {
           database: databaseStatus,
           redis: "online", // Redis not implemented yet, assume online
-          notifications: "online", // Notifications not implemented yet, assume online
+          notifications: "offline", // Notifications not implemented yet, assume online
         },
         performance: {
           responseTime: responseTime + dbResponseTime,
-          cpuUsage: cpuUsage,
+          cpuUsage: Math.min(cpuUsage, 100),
           memoryUsage: Math.min(memoryUsagePercent, 100),
         },
       },

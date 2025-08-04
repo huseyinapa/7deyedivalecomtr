@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, useEffect, useCallback } from "react";
+import Image from "next/image";
 import { GoogleMap, useJsApiLoader } from "@react-google-maps/api";
 
 interface AddressSelectorProps {
@@ -205,10 +206,12 @@ const AddressSelector: React.FC<AddressSelectorProps> = ({
           </GoogleMap>
         </div>
         <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2">
-          <img
+          <Image
             src="https://maps.google.com/mapfiles/ms/icons/red-dot.png"
-            alt="marker"
-            style={{ width: 40, height: 40 }}
+            alt="Konum işaretçisi"
+            width={40}
+            height={40}
+            loading="lazy"
           />
         </div>
         <div className="absolute bottom-1/3 left-1/2 transform -translate-x-1/2 -translate-y-1/2">

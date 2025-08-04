@@ -7,10 +7,13 @@ export default function Footer() {
   return (
     <footer className="relative footer flex flex-col h-[240px] sm:h-[270px] md:h-[300px] lg:h-[300px] xl:h-[370px] text-base-content justify-between items-center bg-[#EDC81E] rounded-t-3xl">
       <div className="flex flex-col md:flex-row w-[99%] justify-between items-center md:p-4">
-        <img
+        <Image
           alt="YediLogo"
-          src={"/assets/yedi_siyah.png"}
+          src="/assets/yedi_siyah.png"
           className="w-[150px] md:w-[270px] lg:w-[270px] h-[70px] object-cover"
+          width={270}
+          height={70}
+          sizes="(max-width: 768px) 150px, 270px"
         />
         <div className="footer flex flex-row justify-center md:justify-end lg:gap-10 md:pr-28">
           <nav className="flex flex-col items-center md:items-start">
@@ -79,15 +82,22 @@ export default function Footer() {
       </div>
       <aside className="absolute bottom-0 flex justify-center">
         <div className="relative">
-          <img
+          <Image
             className="w-screen object-bottom object-contain xl:object-cover h-[245px]"
             alt="binalar"
-            src={"/assets/binalar.png"}
+            src="/assets/binalar.png"
+            width={1920}
+            height={245}
+            sizes="100vw"
+            loading="lazy"
           />
-          <img
+          <Image
             className="absolute bottom-0 left-14 max-h-[220px] h-[20%] sm:h-[40%] md:h-[60%] lg:h-[70%] xl:h-[70%] 2xl:left-[100px] object-cover"
             alt="motor"
-            src={"/assets/motor.png"}
+            src="/assets/motor.png"
+            width={200}
+            height={220}
+            loading="lazy"
           />
         </div>
       </aside>

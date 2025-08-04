@@ -42,7 +42,7 @@ import { Request } from "express";
         },
         throttlers: [
           {
-            ttl: 60000, // 60 seconds
+            ttl: 120000, // 120 seconds
             limit: 50, // 50 requests per minute (more reasonable)
           },
         ],
