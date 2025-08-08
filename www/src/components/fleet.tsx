@@ -28,7 +28,8 @@ export default function Fleet() {
               alt="Tesla araç"
               width={128}
               height={128}
-              loading="lazy"
+              priority
+              sizes="(max-width: 768px) 80px, (max-width: 1024px) 96px, 128px"
             />
             <div className="flex flex-col items-center gap-1">
               <h1 className="text-xl font-bold text-white opacity-70">Araç Kurye</h1>
@@ -46,6 +47,7 @@ export default function Fleet() {
               width={128}
               height={128}
               loading="lazy"
+              sizes="(max-width: 768px) 80px, (max-width: 1024px) 96px, 128px"
             />
             <div className="flex flex-col items-center gap-1">
               <h1 className="text-xl font-bold text-white opacity-70">Moto Kurye</h1>
@@ -64,6 +66,7 @@ export default function Fleet() {
               width={128}
               height={128}
               loading="lazy"
+              sizes="(max-width: 768px) 80px, (max-width: 1024px) 96px, 128px"
             />
             <div className="flex flex-col items-center gap-1">
               <h1 className="text-xl font-bold text-white opacity-70">
@@ -84,6 +87,7 @@ export default function Fleet() {
               width={128}
               height={128}
               loading="lazy"
+              sizes="(max-width: 768px) 80px, (max-width: 1024px) 96px, 128px"
             />
             <div className="flex flex-col items-center gap-1">
               <h1 className="text-xl font-bold text-white opacity-70">
@@ -104,6 +108,7 @@ export default function Fleet() {
               width={128}
               height={128}
               loading="lazy"
+              sizes="(max-width: 768px) 80px, (max-width: 1024px) 96px, 128px"
             />
             <div className="flex flex-col items-center gap-1">
               <h1 className="text-xl font-bold text-white opacity-70">Yaya Kurye</h1>

@@ -1,22 +1,30 @@
 import useSWR from "swr";
 import apiClient from "@/utils/axiosInstance";
 
-interface AdminStats {
+export interface AdminStats {
   totalUsers: number;
+  totalApplications: number;
+  totalCalls: number;
+  totalServices: number;
+  recentLogins: number;
   activeUsers: number;
+  activeSessions: number;
+  recentlyActiveSessions: number;
+  averageSessionDuration: number;
+  // Security metrics
   totalLogins: number;
   failedLogins: number;
   blockedIPs: number;
   suspiciousActivity: number;
 }
 
-interface AdminTrends {
+export interface AdminTrends {
   loginTrend: Array<{ date: string; count: number }>;
   registrationTrend: Array<{ date: string; count: number }>;
   securityEventsTrend: Array<{ date: string; count: number }>;
 }
 
-interface RecentActivity {
+export interface RecentActivity {
   id: string;
   type: "login" | "register" | "failed_login" | "blocked_ip" | "suspicious";
   email?: string;
@@ -24,6 +32,25 @@ interface RecentActivity {
   timestamp: string;
   success: boolean;
   message?: string;
+}
+
+export interface UserSession {
+  sessionId: string;
+  userId: string;
+  email: string;
+  ip: string;
+  userAgent: string;
+  loginTime: string;
+  lastActivity: string;
+  isActive: boolean;
+}
+
+export interface SessionStats {
+  totalActiveSessions: number;
+  totalActiveUsers: number;
+  recentlyActiveSessions: number;
+  sessionsLastHour: number;
+  averageSessionDuration: number;
 }
 
 /**
@@ -39,17 +66,7 @@ export function useAdminStats() {
         );
         return response.data.data;
       } catch (error: any) {
-        // Return mock data if endpoint doesn't exist
-        if (error?.response?.status === 404) {
-          return {
-            totalUsers: 1,
-            activeUsers: 1,
-            totalLogins: 1,
-            failedLogins: 0,
-            blockedIPs: 0,
-            suspiciousActivity: 0,
-          } as AdminStats;
-        }
+        console.error("Error fetching admin stats:", error);
         throw error;
       }
     },
@@ -84,29 +101,13 @@ export function useAdminTrends() {
         );
         return response.data.data;
       } catch (error: any) {
-        // Return mock data if endpoint doesn't exist
-        if (error?.response?.status === 404) {
-          return {
-            loginTrend: [
-              { date: new Date().toISOString().split("T")[0], count: 1 },
-            ],
-            registrationTrend: [
-              { date: new Date().toISOString().split("T")[0], count: 1 },
-            ],
-            securityEventsTrend: [
-              { date: new Date().toISOString().split("T")[0], count: 0 },
-            ],
-          } as AdminTrends;
-        }
+        console.error("Error fetching admin trends:", error);
         throw error;
       }
     },
     {
       refreshInterval: 60000, // Refresh every minute
       revalidateOnFocus: true,
-      shouldRetryOnError: (error) => {
-        return error?.response?.status !== 404;
-      },
     }
   );
 
@@ -131,29 +132,13 @@ export function useRecentActivity(limit: number = 20) {
         );
         return response.data.data;
       } catch (error: any) {
-        // Return mock data if endpoint doesn't exist
-        // if (error?.response?.status === 404) {
-        //   return [
-        //     {
-        //       id: "1",
-        //       type: "login" as const,
-        //       email: "admin@example.com",
-        //       ip: "127.0.0.1",
-        //       timestamp: new Date().toISOString(),
-        //       success: true,
-        //       message: "Successful login",
-        //     },
-        //   ] as RecentActivity[];
-        // }
+        console.error("Error fetching recent activity:", error);
         throw error;
       }
     },
     {
       refreshInterval: 10000, // Refresh every 10 seconds
       revalidateOnFocus: true,
-      shouldRetryOnError: (error) => {
-        return error?.response?.status !== 404;
-      },
     }
   );
 
@@ -191,10 +176,88 @@ export function useAdminActions() {
     return response.data;
   };
 
+  const endSession = async (sessionId: string) => {
+    const response = await apiClient.post(`/admin/sessions/${sessionId}/end`);
+    return response.data;
+  };
+
+  const endAllUserSessions = async (userId: string) => {
+    const response = await apiClient.post(
+      `/admin/users/${userId}/sessions/end-all`
+    );
+    return response.data;
+  };
+
   return {
     unblockIP,
     unlockUser,
     deleteUser,
     updateUserRole,
+    endSession,
+    endAllUserSessions,
+  };
+}
+
+/**
+ * Hook for active sessions
+ */
+export function useActiveSessions() {
+  const { data, error, isLoading, mutate } = useSWR(
+    "/admin/sessions/active",
+    async () => {
+      try {
+        const response = await apiClient.get<{
+          data: UserSession[];
+          total: number;
+        }>("/admin/sessions/active");
+        return response.data;
+      } catch (error: any) {
+        console.error("Error fetching active sessions:", error);
+        throw error;
+      }
+    },
+    {
+      refreshInterval: 15000, // Refresh every 15 seconds
+      revalidateOnFocus: true,
+    }
+  );
+
+  return {
+    sessions: data?.data || [],
+    total: data?.total || 0,
+    isLoading,
+    isError: error,
+    refresh: mutate,
+  };
+}
+
+/**
+ * Hook for session statistics
+ */
+export function useSessionStats() {
+  const { data, error, isLoading, mutate } = useSWR(
+    "/admin/sessions/stats",
+    async () => {
+      try {
+        const response = await apiClient.get<{ data: SessionStats }>(
+          "/admin/sessions/stats"
+        );
+        return response.data.data;
+      } catch (error: any) {
+        console.error("Error fetching session stats:", error);
+        throw error;
+      }
+    },
+    {
+      refreshInterval: 30000, // Refresh every 30 seconds
+      revalidateOnFocus: true,
+    }
+  );
+
+  return {
+    stats: data,
+    isLoading,
+    isError: error,
+    refresh: mutate,
   };
 }

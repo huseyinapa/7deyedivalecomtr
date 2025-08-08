@@ -6,22 +6,27 @@ export default function Carousel() {
     {
       src: "/assets/carousel/vale1.png",
       alt: "7 de Yedi Vale kurye Isparta'da teslimat için hazır",
+      priority: true,
     },
     {
       src: "/assets/carousel/vale2.png",
       alt: "Teslimatı zamanında yetiştiren 7 de Yedi Vale kurye",
+      priority: false,
     },
     {
       src: "/assets/carousel/vale3.png",
       alt: "7 de Yedi Vale kurye motoruyla güvenli teslimat yapıyor",
+      priority: false,
     },
     {
       src: "/assets/carousel/vale4.png",
       alt: "7 de Yedi Vale kurye yolda hızla ilerliyor",
+      priority: false,
     },
     {
       src: "/assets/carousel/vale5.png",
       alt: "Dağlık bölgede güvenle seyahat eden 7 de Yedi Vale kurye",
+      priority: false,
     },
   ];
 
@@ -80,11 +85,13 @@ export default function Carousel() {
                   "top-1/2 left-1/2 -translate-x-1/2 -translate-y-2/4"
                   }`}
                 alt={image.alt}
-                priority={index === 0}
-                loading={index === 0 ? "eager" : "lazy"}
+                priority={image.priority}
+                loading={image.priority ? "eager" : "lazy"}
                 width={1260}
                 height={800}
                 sizes="100vw"
+                placeholder="blur"
+                blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkrHBEf/EABUBAQEAAAAAAAAAAAAAAAAAAAAAAAAB/8QAFxEAAwEAAAAAAAAAAAAAAAAAAAECEf/aAAwDAQACEQMRAD8AltJagyeH0AthI5xdrLcNM91BF5pX2HaH9bcfaSXWGaRmknyJckliyjqTzSlT54b6bk+h0R//2Q=="
               />
             </div>
           ))}

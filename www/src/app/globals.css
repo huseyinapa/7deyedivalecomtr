@@ -2,6 +2,32 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Performance optimizations */
+@layer base {
+  /* Smooth scrolling */
+  html {
+    scroll-behavior: smooth;
+  }
+
+  /* GPU acceleration for transforms */
+  .transform-gpu {
+    transform: translateZ(0);
+  }
+
+  /* Optimize images */
+  img {
+    content-visibility: auto;
+  }
+
+  /* Optimize fonts */
+  body {
+    font-display: swap;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
 @layer base {
   :root {
     --background: 0 0% 100%;

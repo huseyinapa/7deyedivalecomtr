@@ -36,6 +36,18 @@ export default function RootLayout({ children }: RootLayoutProps) {
     <html lang="tr">
       <head>
         <GoogleAnalytics />
+
+        {/* Performance optimizations */}
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link rel="dns-prefetch" href="https://www.google-analytics.com" />
+
+        {/* Preload critical assets */}
+        <link rel="preload" href="/assets/yedi_siyah.png" as="image" type="image/png" />
+        <link rel="preload" href="/assets/carousel/vale1.png" as="image" type="image/png" />
+        <link rel="preload" href="/assets/tesla.png" as="image" type="image/png" />
+
+        {/* OpenGraph meta tags */}
         <meta property="og:title" content={metadata.openGraph.title} />
         <meta
           property="og:description"

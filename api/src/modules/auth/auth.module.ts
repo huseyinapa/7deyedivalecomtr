@@ -6,6 +6,7 @@ import { AuthService } from "./auth.service";
 import { AuthController } from "./auth.controller";
 import { JwtStrategy } from "./strategies/jwt.strategy";
 import { LocalStrategy } from "./strategies/local.strategy";
+import { SessionTrackingService } from "./session-tracking.service";
 import { UsersModule } from "../users/users.module";
 import { AuthRateLimitMiddleware } from "../../common/middleware/auth-rate-limit.middleware";
 import { AuditLogMiddleware } from "../../common/middleware/audit-log.middleware";
@@ -28,8 +29,8 @@ import { AuditLogMiddleware } from "../../common/middleware/audit-log.middleware
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, JwtStrategy, LocalStrategy],
-  exports: [AuthService],
+  providers: [AuthService, SessionTrackingService, JwtStrategy, LocalStrategy],
+  exports: [AuthService, SessionTrackingService],
 })
 export class AuthModule {
   configure(consumer: MiddlewareConsumer) {

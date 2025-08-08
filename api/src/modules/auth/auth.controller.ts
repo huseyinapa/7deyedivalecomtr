@@ -146,6 +146,11 @@ export class AuthController {
 
     this.logger.log(`Logout from IP: ${clientIp}, User: ${user.email}`);
 
+    // End session if sessionId exists
+    if (user.sessionId) {
+      this.authService.endSession(user.sessionId);
+    }
+
     // Clear cookie
     res.clearCookie("access_token");
 

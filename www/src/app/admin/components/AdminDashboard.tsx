@@ -25,6 +25,7 @@ import {
   SignalIcon,
 } from "@heroicons/react/24/outline";
 import { adminApiService, type DashboardStats, type RecentActivity, type SystemHealth, type AnalyticsData } from "@/lib/api/admin.service";
+import { useActiveSessions, useSessionStats, type UserSession, type SessionStats } from "@/hooks/useAdmin";
 import { toast } from "react-hot-toast";
 
 // Loading Skeleton Component
@@ -342,6 +343,10 @@ export default function AdminDashboard() {
   const [error, setError] = useState<string | null>(null);
   const [selectedPeriod, setSelectedPeriod] = useState<"day" | "week" | "month" | "year">("week");
 
+  // Session tracking hooks
+  const { sessions: activeSessions, isLoading: sessionsLoading } = useActiveSessions();
+  const { stats: sessionStats, isLoading: sessionStatsLoading } = useSessionStats();
+
   // Debug state
   const [debugInfo, setDebugInfo] = useState<string>("Yükleniyor...");
   const [lastHealthUpdate, setLastHealthUpdate] = useState<string>("Henüz güncellenmedi");
@@ -362,24 +367,24 @@ export default function AdminDashboard() {
         if (statsRes.status === "rejected") {
           console.error("Stats fetch failed:", statsRes.reason);
         }
-        // Fallback to mock data for development
+        // No fallback data - show empty state
         setStats({
-          totalOrders: 1247,
-          activeOrders: 89,
-          completedOrders: 1158,
-          cancelledOrders: 32,
-          totalCouriers: 156,
-          activeCouriers: 89,
-          availableCouriers: 45,
-          pendingApplications: 23,
-          approvedApplications: 156,
-          rejectedApplications: 12,
-          todayOrders: 45,
-          weeklyRevenue: 15420,
-          monthlyRevenue: 67890,
-          averageDeliveryTime: 28,
-          completionRate: 92.8,
-          customerSatisfaction: 4.6,
+          totalOrders: 0,
+          activeOrders: 0,
+          completedOrders: 0,
+          cancelledOrders: 0,
+          totalCouriers: 0,
+          activeCouriers: 0,
+          availableCouriers: 0,
+          pendingApplications: 0,
+          approvedApplications: 0,
+          rejectedApplications: 0,
+          todayOrders: 0,
+          weeklyRevenue: 0,
+          monthlyRevenue: 0,
+          averageDeliveryTime: 0,
+          completionRate: 0,
+          customerSatisfaction: 0,
         });
       }
 
@@ -389,45 +394,8 @@ export default function AdminDashboard() {
         if (activitiesRes.status === "rejected") {
           console.error("Activities fetch failed:", activitiesRes.reason);
         }
-        // Fallback to mock data
-        setRecentActivities([
-          {
-            id: "1",
-            type: "order",
-            action: "Yeni sipariş",
-            description: "Kurye ataması bekleniyor - Kadıköy > Üsküdar",
-            user: { id: "u1", email: "customer@example.com", role: "user" },
-            timestamp: new Date().toISOString(),
-            status: "info"
-          },
-          {
-            id: "2",
-            type: "courier",
-            action: "Kurye aktif",
-            description: "Ahmet Yılmaz çevrimiçi oldu",
-            user: { id: "c1", email: "kurye@example.com", role: "courier" },
-            timestamp: new Date(Date.now() - 300000).toISOString(),
-            status: "success"
-          },
-          {
-            id: "3",
-            type: "application",
-            action: "Yeni başvuru",
-            description: "Kurye başvurusu onay bekliyor",
-            user: null,
-            timestamp: new Date(Date.now() - 600000).toISOString(),
-            status: "warning"
-          },
-          {
-            id: "4",
-            type: "order",
-            action: "Sipariş teslim edildi",
-            description: "Başarılı teslimat - 5 yıldız aldı",
-            user: { id: "c2", email: "kurye2@example.com", role: "courier" },
-            timestamp: new Date(Date.now() - 900000).toISOString(),
-            status: "success"
-          }
-        ]);
+        // No fallback data - show empty state
+        setRecentActivities([]);
       }
 
       // System health - gerçek veriyi kullan, fallback sadece hata durumunda
@@ -466,47 +434,18 @@ export default function AdminDashboard() {
       if (analyticsRes.status === "fulfilled" && analyticsRes.value.data) {
         setAnalytics(analyticsRes.value.data);
       } else {
-        // Mock analytics data
+        // No fallback data - show empty state
         setAnalytics({
-          ordersByStatus: [
-            { status: "completed", count: 1158, percentage: 85 },
-            { status: "active", count: 89, percentage: 10 },
-            { status: "cancelled", count: 32, percentage: 5 }
-          ],
-          couriersByStatus: [
-            { status: "active", count: 89, percentage: 70 },
-            { status: "available", count: 45, percentage: 25 },
-            { status: "offline", count: 22, percentage: 5 }
-          ],
-          applicationsByStatus: [
-            { status: "approved", count: 156, percentage: 80 },
-            { status: "pending", count: 23, percentage: 15 },
-            { status: "rejected", count: 12, percentage: 5 }
-          ],
+          ordersByStatus: [],
+          couriersByStatus: [],
+          applicationsByStatus: [],
           revenueByPeriod: [],
           ordersByHour: [],
-          topCouriers: [
-            {
-              id: "1",
-              name: "Ahmet Yılmaz",
-              email: "ahmet@example.com",
-              completedOrders: 245,
-              rating: 4.8,
-              revenue: 5670
-            },
-            {
-              id: "2",
-              name: "Mehmet Özkan",
-              email: "mehmet@example.com",
-              completedOrders: 198,
-              rating: 4.6,
-              revenue: 4320
-            }
-          ],
+          topCouriers: [],
           customerMetrics: {
-            newCustomers: 45,
-            returningCustomers: 156,
-            customerRetentionRate: 78
+            newCustomers: 0,
+            returningCustomers: 0,
+            customerRetentionRate: 0
           }
         });
       }
@@ -544,42 +483,12 @@ export default function AdminDashboard() {
         if (healthRes && healthRes.data) {
           setSystemHealth(healthRes.data);
         } else {
-          // Test için mock data
-          setSystemHealth({
-            status: "healthy",
-            uptime: 1234,
-            environment: "development",
-            timestamp: new Date().toISOString(),
-            services: {
-              database: "online",
-              redis: "online",
-              notifications: "online"
-            },
-            performance: {
-              responseTime: 45,
-              cpuUsage: 25,
-              memoryUsage: 35
-            }
-          });
+          // No fallback data - system health unavailable
+          setSystemHealth(null);
         }
       } catch (error) {
-        // Hata durumunda test verisi göster
-        setSystemHealth({
-          status: "warning",
-          uptime: 500,
-          environment: "development",
-          timestamp: new Date().toISOString(),
-          services: {
-            database: "online",
-            redis: "degraded",
-            notifications: "online"
-          },
-          performance: {
-            responseTime: 120,
-            cpuUsage: 65,
-            memoryUsage: 78
-          }
-        });
+        console.error("System health fetch error:", error);
+        setSystemHealth(null);
       }
     };
 
@@ -607,7 +516,13 @@ export default function AdminDashboard() {
       weeklyRevenue: stats.weeklyRevenue || 0,
       averageDeliveryTime: stats.averageDeliveryTime || 0,
       completionRate: stats.completionRate || 0,
-      customerSatisfaction: stats.customerSatisfaction || 0
+      customerSatisfaction: stats.customerSatisfaction || 0,
+      // Session stats
+      activeUsers: sessionStats?.totalActiveUsers || 0,
+      totalSessions: sessionStats?.totalActiveSessions || 0,
+      recentlyActiveSessions: sessionStats?.recentlyActiveSessions || 0,
+      sessionsLastHour: sessionStats?.sessionsLastHour || 0,
+      avgSessionDuration: sessionStats?.averageSessionDuration || 0
     };
 
     return [
@@ -685,6 +600,38 @@ export default function AdminDashboard() {
         title: "Müşteri Memnuniyeti",
         value: `${safeStats.customerSatisfaction}/5`,
         icon: StarIcon,
+        color: "yellow" as const
+      },
+      {
+        title: "Aktif Kullanıcı",
+        value: safeStats.activeUsers,
+        icon: UsersIcon,
+        color: "green" as const,
+        change: { value: sessionStats?.totalActiveUsers ? 5 : 0, type: "increase" as const }
+      },
+      {
+        title: "Aktif Oturum",
+        value: safeStats.totalSessions,
+        icon: ServerIcon,
+        color: "blue" as const
+      },
+      {
+        title: "Son Zamanlarda Aktif",
+        value: safeStats.recentlyActiveSessions,
+        icon: SignalIcon,
+        color: "indigo" as const
+      },
+      {
+        title: "Son 1 Saatteki Oturum",
+        value: safeStats.sessionsLastHour,
+        icon: ClockIcon,
+        color: "purple" as const,
+        change: { value: safeStats.sessionsLastHour > 0 ? 10 : 0, type: "increase" as const }
+      },
+      {
+        title: "Ort. Oturum Süresi",
+        value: `${Math.round(safeStats.avgSessionDuration / 60)} dk`,
+        icon: ClockIcon,
         color: "yellow" as const
       }
     ];
@@ -770,6 +717,80 @@ export default function AdminDashboard() {
           ))
         }
       </div>
+
+      {/* Active Sessions Section */}
+      {!sessionsLoading && activeSessions && activeSessions.length > 0 && (
+        <div className="bg-white overflow-hidden shadow rounded-lg">
+          <div className="px-4 py-5 sm:px-6 border-b border-gray-200">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-lg leading-6 font-medium text-gray-900">
+                  Aktif Oturumlar
+                </h3>
+                <p className="mt-1 max-w-2xl text-sm text-gray-500">
+                  Şu anda sisteme giriş yapmış kullanıcılar ({activeSessions.length} oturum)
+                </p>
+              </div>
+              <div className="flex items-center space-x-2">
+                <div className="flex items-center">
+                  <div className="w-2 h-2 bg-green-400 rounded-full mr-2"></div>
+                  <span className="text-sm text-gray-500">Canlı</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="px-4 py-5 sm:p-6">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {activeSessions.slice(0, 6).map((session) => (
+                <div
+                  key={session.sessionId}
+                  className="relative rounded-lg border border-gray-300 bg-white px-6 py-5 shadow-sm hover:border-gray-400 hover:shadow-md transition-all"
+                >
+                  <div className="flex items-center space-x-3">
+                    <div className="flex-shrink-0">
+                      <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
+                        <UsersIcon className="h-6 w-6 text-blue-600" />
+                      </div>
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <div className="focus:outline-none">
+                        <span className="absolute inset-0" aria-hidden="true" />
+                        <p className="text-sm font-medium text-gray-900 truncate">
+                          {session.email}
+                        </p>
+                        <p className="text-sm text-gray-500 truncate">
+                          {session.ip}
+                        </p>
+                        <p className="text-xs text-gray-400">
+                          Giriş: {new Date(session.loginTime).toLocaleTimeString("tr-TR")}
+                        </p>
+                        <p className="text-xs text-gray-400">
+                          Son Aktivite: {new Date(session.lastActivity).toLocaleTimeString("tr-TR")}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex-shrink-0">
+                      <div className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${session.isActive
+                        ? 'bg-green-100 text-green-800'
+                        : 'bg-gray-100 text-gray-800'
+                        }`}>
+                        {session.isActive ? 'Aktif' : 'Pasif'}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+            {activeSessions.length > 6 && (
+              <div className="mt-4 text-center">
+                <button className="text-sm text-blue-600 hover:text-blue-800 font-medium">
+                  {activeSessions.length - 6} oturum daha göster
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Debug Panel - Development only */}
       {process.env.NODE_ENV === 'development' && (
@@ -892,6 +913,140 @@ export default function AdminDashboard() {
               <ServerIcon className="h-4 w-4 mr-2" />
               Önbellek Temizle
             </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Real-Time Session Dashboard */}
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+        {/* Session Statistics */}
+        <div className="bg-white overflow-hidden shadow rounded-lg">
+          <div className="px-4 py-5 sm:px-6 border-b border-gray-200">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-lg leading-6 font-medium text-gray-900">
+                  Oturum İstatistikleri
+                </h3>
+                <p className="mt-1 max-w-2xl text-sm text-gray-500">
+                  Gerçek zamanlı kullanıcı oturum verileri
+                </p>
+              </div>
+              <div className="flex items-center space-x-2">
+                <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                <span className="text-sm text-gray-500">Canlı</span>
+              </div>
+            </div>
+          </div>
+          <div className="px-4 py-5 sm:p-6">
+            {sessionStatsLoading ? (
+              <div className="space-y-4">
+                {Array.from({ length: 4 }).map((_, index) => (
+                  <div key={index} className="animate-pulse flex justify-between items-center">
+                    <div className="h-4 bg-gray-200 rounded w-1/3"></div>
+                    <div className="h-4 bg-gray-200 rounded w-1/4"></div>
+                  </div>
+                ))}
+              </div>
+            ) : sessionStats ? (
+              <div className="space-y-4">
+                <div className="flex justify-between items-center">
+                  <span className="text-sm font-medium text-gray-900">Toplam Aktif Oturum</span>
+                  <span className="text-2xl font-bold text-blue-600">{sessionStats.totalActiveSessions}</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm font-medium text-gray-900">Toplam Aktif Kullanıcı</span>
+                  <span className="text-2xl font-bold text-green-600">{sessionStats.totalActiveUsers}</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm font-medium text-gray-900">Son Zamanlarda Aktif</span>
+                  <span className="text-2xl font-bold text-indigo-600">{sessionStats.recentlyActiveSessions}</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm font-medium text-gray-900">Son 1 Saatteki Oturum</span>
+                  <span className="text-2xl font-bold text-purple-600">{sessionStats.sessionsLastHour}</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm font-medium text-gray-900">Ortalama Oturum Süresi</span>
+                  <span className="text-2xl font-bold text-yellow-600">
+                    {Math.round(sessionStats.averageSessionDuration / 60)} dk
+                  </span>
+                </div>
+              </div>
+            ) : (
+              <div className="text-center py-6">
+                <ServerIcon className="mx-auto h-12 w-12 text-gray-400" />
+                <h3 className="mt-2 text-sm font-medium text-gray-900">Oturum verisi yok</h3>
+                <p className="mt-1 text-sm text-gray-500">Session tracking verileri yüklenemedi.</p>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Active Sessions List */}
+        <div className="bg-white overflow-hidden shadow rounded-lg">
+          <div className="px-4 py-5 sm:px-6 border-b border-gray-200">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-lg leading-6 font-medium text-gray-900">
+                  Aktif Oturumlar
+                </h3>
+                <p className="mt-1 max-w-2xl text-sm text-gray-500">
+                  {activeSessions ? `${activeSessions.length} aktif oturum` : 'Oturum bilgisi yükleniyor...'}
+                </p>
+              </div>
+            </div>
+          </div>
+          <div className="px-4 py-5 sm:p-6">
+            {sessionsLoading ? (
+              <div className="space-y-3">
+                {Array.from({ length: 4 }).map((_, index) => (
+                  <div key={index} className="animate-pulse flex space-x-3">
+                    <div className="h-10 w-10 bg-gray-200 rounded-full"></div>
+                    <div className="flex-1 space-y-2">
+                      <div className="h-4 bg-gray-200 rounded w-2/3"></div>
+                      <div className="h-3 bg-gray-200 rounded w-1/3"></div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : activeSessions && activeSessions.length > 0 ? (
+              <div className="space-y-3 max-h-80 overflow-y-auto">
+                {activeSessions.map((session) => (
+                  <div key={session.sessionId} className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                    <div className="flex-shrink-0">
+                      <div className="h-10 w-10 bg-blue-100 rounded-full flex items-center justify-center">
+                        <UsersIcon className="h-5 w-5 text-blue-600" />
+                      </div>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-gray-900 truncate">
+                        {session.email}
+                      </p>
+                      <p className="text-xs text-gray-500 truncate">
+                        IP: {session.ip}
+                      </p>
+                      <p className="text-xs text-gray-400">
+                        Son aktivite: {new Date(session.lastActivity).toLocaleTimeString("tr-TR")}
+                      </p>
+                    </div>
+                    <div className="flex-shrink-0">
+                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${session.isActive
+                        ? 'bg-green-100 text-green-800'
+                        : 'bg-gray-100 text-gray-800'
+                        }`}>
+                        {session.isActive ? 'Aktif' : 'Pasif'}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-6">
+                <UsersIcon className="mx-auto h-12 w-12 text-gray-400" />
+                <h3 className="mt-2 text-sm font-medium text-gray-900">Aktif oturum yok</h3>
+                <p className="mt-1 text-sm text-gray-500">Şu anda hiç aktif kullanıcı bulunmuyor.</p>
+              </div>
+            )}
           </div>
         </div>
       </div>

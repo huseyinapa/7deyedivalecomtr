@@ -7,6 +7,7 @@ import {
 } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import { UsersService } from "../users/users.service";
+import { SessionTrackingService } from "./session-tracking.service";
 import * as bcrypt from "bcrypt";
 import { LoginDto } from "./dto/login.dto";
 
@@ -34,7 +35,8 @@ export class AuthService {
 
   constructor(
     private userService: UsersService,
-    private jwtService: JwtService
+    private jwtService: JwtService,
+    private sessionTrackingService: SessionTrackingService
   ) {}
 
   async validateUser(
@@ -111,11 +113,20 @@ export class AuthService {
 
     const user = await this.validateUser(loginDto.email, loginDto.password, ip);
 
+    // Create session
+    const sessionId = this.sessionTrackingService.createSession(
+      user.id,
+      user.email,
+      ip || "unknown",
+      userAgent || "unknown"
+    );
+
     // Generate secure JWT payload
     const payload = {
       email: user.email,
       sub: user.id,
       role: user.role,
+      sessionId, // Include session ID in JWT
       iat: Math.floor(Date.now() / 1000),
       jti: this.generateJti(), // JWT ID for token blacklisting
     };
@@ -124,7 +135,7 @@ export class AuthService {
 
     // Log successful login
     this.logger.log(
-      `✅ Successful login: ${user.email} from IP: ${ip || "unknown"}`
+      `✅ Successful login: ${user.email} from IP: ${ip || "unknown"}, Session: ${sessionId}`
     );
 
     return {
@@ -136,6 +147,7 @@ export class AuthService {
         isActive: user.isActive,
       },
       accessToken,
+      sessionId,
     };
   }
 
@@ -266,5 +278,58 @@ export class AuthService {
     this.loginAttempts.length = 0;
     this.blockedAccounts.clear();
     this.logger.log(`🔄 All login attempts and blocks reset`);
+  }
+
+  // Session tracking methods
+  getSessionStats() {
+    return this.sessionTrackingService.getSessionStats();
+  }
+
+  getActiveSessions() {
+    return this.sessionTrackingService.getActiveSessions();
+  }
+
+  getUserSessions(userId: string) {
+    return this.sessionTrackingService.getUserSessions(userId);
+  }
+
+  endSession(sessionId: string) {
+    return this.sessionTrackingService.endSession(sessionId);
+  }
+
+  endAllUserSessions(userId: string) {
+    return this.sessionTrackingService.endAllUserSessions(userId);
+  }
+
+  updateSessionActivity(sessionId: string) {
+    return this.sessionTrackingService.updateActivity(sessionId);
+  }
+
+  // Admin methods for security monitoring
+  getBlockedIPs(): string[] {
+    // Simple implementation - can be enhanced with database storage
+    const blockedIPs = new Set<string>();
+
+    // Get IPs with multiple failed attempts in the last hour
+    const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
+    const recentFailures = this.loginAttempts.filter(
+      (attempt) => !attempt.success && attempt.timestamp > oneHourAgo
+    );
+
+    // Group by IP and count failures
+    const ipFailureCounts = new Map<string, number>();
+    recentFailures.forEach((attempt) => {
+      const count = ipFailureCounts.get(attempt.ip) || 0;
+      ipFailureCounts.set(attempt.ip, count + 1);
+    });
+
+    // Consider IPs with 3+ failures as blocked
+    ipFailureCounts.forEach((count, ip) => {
+      if (count >= 3) {
+        blockedIPs.add(ip);
+      }
+    });
+
+    return Array.from(blockedIPs);
   }
 }

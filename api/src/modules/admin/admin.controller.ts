@@ -65,30 +65,84 @@ export class AdminController {
       averageDeliveryTime: number;
       completionRate: number;
       customerSatisfaction: number;
+      activeUsers: number;
+      activeSessions: number;
+      recentLogins: number;
+      // Security metrics
+      totalLogins: number;
+      failedLogins: number;
+      blockedIPs: number;
+      suspiciousActivity: number;
     };
   }> {
-    // Mock data for now - replace with real database queries
-    return {
-      success: true,
-      data: {
-        totalOrders: 1247,
-        activeOrders: 89,
-        completedOrders: 1158,
-        cancelledOrders: 32,
-        totalCouriers: 156,
-        activeCouriers: 89,
-        availableCouriers: 45,
-        pendingApplications: 23,
-        approvedApplications: 156,
-        rejectedApplications: 12,
-        todayOrders: 45,
-        weeklyRevenue: 15420,
-        monthlyRevenue: 67890,
-        averageDeliveryTime: 28,
-        completionRate: 92.8,
-        customerSatisfaction: 4.6,
-      },
-    };
+    try {
+      // Get real application statistics
+      const applications = await this.courierApplicationService.findAll();
+      const sessionStats = this.authService.getSessionStats();
+      const loginAttempts = this.authService.getLoginAttempts();
+
+      // Calculate security metrics
+      const totalLogins = loginAttempts.filter(
+        (attempt) => attempt.success
+      ).length;
+      const failedLogins = loginAttempts.filter(
+        (attempt) => !attempt.success
+      ).length;
+      const blockedIPs = this.authService.getBlockedIPs().length;
+      const suspiciousActivity = loginAttempts.filter(
+        (attempt) =>
+          !attempt.success &&
+          Date.now() - attempt.timestamp.getTime() < 60 * 60 * 1000 // Last hour
+      ).length;
+
+      const pendingApplications = applications.filter(
+        (app) => app.status === "pending"
+      ).length;
+      const approvedApplications = applications.filter(
+        (app) => app.status === "approved"
+      ).length;
+      const rejectedApplications = applications.filter(
+        (app) => app.status === "rejected"
+      ).length;
+      const recentSuccessfulLogins = loginAttempts.filter(
+        (attempt) =>
+          attempt.success &&
+          Date.now() - attempt.timestamp.getTime() < 24 * 60 * 60 * 1000 // Last 24 hours
+      ).length;
+
+      return {
+        success: true,
+        data: {
+          totalOrders: 0, // Not implemented yet
+          activeOrders: 0, // Not implemented yet
+          completedOrders: 0, // Not implemented yet
+          cancelledOrders: 0, // Not implemented yet
+          totalCouriers: 0, // Not implemented yet
+          activeCouriers: 0, // Not implemented yet
+          availableCouriers: 0, // Not implemented yet
+          pendingApplications,
+          approvedApplications,
+          rejectedApplications,
+          todayOrders: 0, // Not implemented yet
+          weeklyRevenue: 0, // Not implemented yet
+          monthlyRevenue: 0, // Not implemented yet
+          averageDeliveryTime: 0, // Not implemented yet
+          completionRate: 0, // Not implemented yet
+          customerSatisfaction: 0, // Not implemented yet
+          activeUsers: sessionStats.totalActiveUsers,
+          activeSessions: sessionStats.totalActiveSessions,
+          recentLogins: recentSuccessfulLogins,
+          // Security metrics
+          totalLogins,
+          failedLogins,
+          blockedIPs,
+          suspiciousActivity,
+        },
+      };
+    } catch (error) {
+      console.error("Error fetching dashboard stats:", error);
+      throw error;
+    }
   }
 
   @Get("system/health")
@@ -157,9 +211,11 @@ export class AdminController {
         const elapsedUserMs = elapsedUsage.user / 1000;
         const elapsedSystemMs = elapsedUsage.system / 1000;
 
-        const cpuPercent =
-          ((elapsedUserMs + elapsedSystemMs) / elapsedTimeMs) * 100;
-        resolve(cpuPercent);
+        const cpuPercent = (
+          ((elapsedUserMs + elapsedSystemMs) / elapsedTimeMs) *
+          100
+        ).toFixed(2);
+        resolve(parseFloat(cpuPercent));
       }, 100);
     });
 
@@ -226,49 +282,10 @@ export class AdminController {
       metadata?: Record<string, any>;
     }>;
   }> {
-    // Mock data for now
-    const activities = [
-      {
-        id: "1",
-        type: "order" as const,
-        action: "Yeni sipariş",
-        description: "Kurye ataması bekleniyor - Kadıköy > Üsküdar",
-        user: { id: "u1", email: "customer@example.com", role: "user" },
-        timestamp: new Date().toISOString(),
-        status: "info" as const,
-      },
-      {
-        id: "2",
-        type: "courier" as const,
-        action: "Kurye aktif",
-        description: "Ahmet Yılmaz çevrimiçi oldu",
-        user: { id: "c1", email: "kurye@example.com", role: "courier" },
-        timestamp: new Date(Date.now() - 300000).toISOString(),
-        status: "success" as const,
-      },
-      {
-        id: "3",
-        type: "application" as const,
-        action: "Yeni başvuru",
-        description: "Kurye başvurusu onay bekliyor",
-        user: null,
-        timestamp: new Date(Date.now() - 600000).toISOString(),
-        status: "warning" as const,
-      },
-      {
-        id: "4",
-        type: "order" as const,
-        action: "Sipariş teslim edildi",
-        description: "Başarılı teslimat - 5 yıldız aldı",
-        user: { id: "c2", email: "kurye2@example.com", role: "courier" },
-        timestamp: new Date(Date.now() - 900000).toISOString(),
-        status: "success" as const,
-      },
-    ];
-
+    // Return empty activities since we don't have real activity tracking yet
     return {
       success: true,
-      data: activities.slice(0, limit),
+      data: [],
     };
   }
 
@@ -316,52 +333,47 @@ export class AdminController {
       };
     };
   }> {
-    // Mock analytics data
-    return {
-      success: true,
-      data: {
-        ordersByStatus: [
-          { status: "completed", count: 1158, percentage: 85 },
-          { status: "active", count: 89, percentage: 10 },
-          { status: "cancelled", count: 32, percentage: 5 },
-        ],
-        couriersByStatus: [
-          { status: "active", count: 89, percentage: 70 },
-          { status: "available", count: 45, percentage: 25 },
-          { status: "offline", count: 22, percentage: 5 },
-        ],
-        applicationsByStatus: [
-          { status: "approved", count: 156, percentage: 80 },
-          { status: "pending", count: 23, percentage: 15 },
-          { status: "rejected", count: 12, percentage: 5 },
-        ],
-        revenueByPeriod: [],
-        ordersByHour: [],
-        topCouriers: [
-          {
-            id: "1",
-            name: "Ahmet Yılmaz",
-            email: "ahmet@example.com",
-            completedOrders: 245,
-            rating: 4.8,
-            revenue: 5670,
-          },
-          {
-            id: "2",
-            name: "Mehmet Özkan",
-            email: "mehmet@example.com",
-            completedOrders: 198,
-            rating: 4.6,
-            revenue: 4320,
-          },
-        ],
-        customerMetrics: {
-          newCustomers: 45,
-          returningCustomers: 156,
-          customerRetentionRate: 78,
+    try {
+      // Get real application statistics
+      const applications = await this.courierApplicationService.findAll();
+
+      const statusCounts = applications.reduce(
+        (acc, app) => {
+          acc[app.status] = (acc[app.status] || 0) + 1;
+          return acc;
         },
-      },
-    };
+        {} as Record<string, number>
+      );
+
+      const total = applications.length;
+      const applicationsByStatus = Object.entries(statusCounts).map(
+        ([status, count]) => ({
+          status,
+          count,
+          percentage: total > 0 ? (count / total) * 100 : 0,
+        })
+      );
+
+      return {
+        success: true,
+        data: {
+          ordersByStatus: [], // Not implemented yet
+          couriersByStatus: [], // Not implemented yet
+          applicationsByStatus,
+          revenueByPeriod: [], // Not implemented yet
+          ordersByHour: [], // Not implemented yet
+          topCouriers: [], // Not implemented yet
+          customerMetrics: {
+            newCustomers: 0, // Not implemented yet
+            returningCustomers: 0, // Not implemented yet
+            customerRetentionRate: 0, // Not implemented yet
+          },
+        },
+      };
+    } catch (error) {
+      console.error("Error fetching analytics:", error);
+      throw error;
+    }
   }
 
   @Get("login-attempts")
@@ -407,18 +419,31 @@ export class AdminController {
     description: "Admin statistics retrieved successfully",
   })
   async getStats(@CurrentUser() user?: any) {
-    // Mock statistics for now
-    return {
-      success: true,
-      data: {
-        totalUsers: 1,
-        totalApplications: 0,
-        totalCalls: 0,
-        totalServices: 0,
-        recentLogins: 1,
-        activeUsers: 1,
-      },
-    };
+    try {
+      // Get real statistics from database
+      const applications = await this.courierApplicationService.findAll();
+      const loginAttempts = this.authService.getLoginAttempts();
+      const sessionStats = this.authService.getSessionStats();
+
+      return {
+        success: true,
+        data: {
+          totalUsers: 0, // Not implemented yet - need user service
+          totalApplications: applications.length,
+          totalCalls: 0, // Not implemented yet - need call service
+          totalServices: 0, // Not implemented yet - need service tracking
+          recentLogins: loginAttempts.filter((attempt) => attempt.success)
+            .length,
+          activeUsers: sessionStats.totalActiveUsers,
+          activeSessions: sessionStats.totalActiveSessions,
+          recentlyActiveSessions: sessionStats.recentlyActiveSessions,
+          averageSessionDuration: sessionStats.averageSessionDuration,
+        },
+      };
+    } catch (error) {
+      console.error("Error fetching stats:", error);
+      throw error;
+    }
   }
 
   @Get("trends")
@@ -429,18 +454,16 @@ export class AdminController {
     description: "Admin trends retrieved successfully",
   })
   async getTrends(@Query("period") period?: string, @CurrentUser() user?: any) {
-    // Mock trends data for now
-    return {
-      success: true,
-      data: [
-        {
-          date: new Date().toISOString().split("T")[0],
-          users: 1,
-          applications: 0,
-          calls: 0,
-        },
-      ],
-    };
+    try {
+      // Return empty trends data since we don't have historical tracking yet
+      return {
+        success: true,
+        data: [],
+      };
+    } catch (error) {
+      console.error("Error fetching trends:", error);
+      throw error;
+    }
   }
 
   @Get("recent-activity")
@@ -500,6 +523,69 @@ export class AdminController {
     return {
       success: true,
       message: "All login attempts and blocks have been reset",
+    };
+  }
+
+  @Get("sessions/active")
+  @Roles("admin")
+  @ApiOperation({ summary: "Get active user sessions" })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: "List of active user sessions",
+  })
+  async getActiveSessions(@CurrentUser() user?: any) {
+    const sessions = this.authService.getActiveSessions();
+    return {
+      success: true,
+      data: sessions,
+      total: sessions.length,
+    };
+  }
+
+  @Get("sessions/stats")
+  @Roles("admin")
+  @ApiOperation({ summary: "Get session statistics" })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: "Session statistics",
+  })
+  async getSessionStats(@CurrentUser() user?: any) {
+    const stats = this.authService.getSessionStats();
+    return {
+      success: true,
+      data: stats,
+    };
+  }
+
+  @Post("sessions/:sessionId/end")
+  @Roles("admin")
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: "End a specific session (Admin only)" })
+  @ApiParam({ name: "sessionId", description: "Session ID to end" })
+  async endSession(@Param("sessionId") sessionId: string): Promise<{
+    success: boolean;
+    message: string;
+  }> {
+    this.authService.endSession(sessionId);
+    return {
+      success: true,
+      message: `Session ${sessionId} has been ended`,
+    };
+  }
+
+  @Post("users/:userId/sessions/end-all")
+  @Roles("admin")
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: "End all sessions for a user (Admin only)" })
+  @ApiParam({ name: "userId", description: "User ID to end all sessions for" })
+  async endAllUserSessions(@Param("userId") userId: string): Promise<{
+    success: boolean;
+    message: string;
+  }> {
+    this.authService.endAllUserSessions(userId);
+    return {
+      success: true,
+      message: `All sessions for user ${userId} have been ended`,
     };
   }
 
@@ -1068,58 +1154,71 @@ export class AdminController {
       count: number;
     };
   }> {
-    // Bu endpoint CSV verisi döndürür, frontend'de dosya olarak kaydedilir
-    const headers = [
-      "ID",
-      "Ad",
-      "Soyad",
-      "E-posta",
-      "Telefon",
-      "Şehir",
-      "Çalışma Periyodu",
-      "Durum",
-      "Tamamlanma %",
-      "Başvuru Tarihi",
-    ];
+    try {
+      // Build query conditions
+      const queryBuilder =
+        this.courierApplicationService[
+          "courierApplicationRepository"
+        ].createQueryBuilder("application");
 
-    // Mock data - gerçek uygulamada filtrelenmiş veri gelecek
-    const rows = [
-      [
-        "app-1",
-        "Ahmet",
-        "Yılmaz",
-        "ahmet@example.com",
-        "+90 532 123 4567",
-        "İstanbul",
-        "Tam Zamanlı",
-        "Beklemede",
-        "85%",
-        "2025-08-04",
-      ],
-      [
-        "app-2",
-        "Mehmet",
-        "Özkan",
-        "mehmet@example.com",
-        "+90 532 987 6543",
-        "Ankara",
-        "Yarı Zamanlı",
-        "İnceleniyor",
-        "92%",
-        "2025-08-03",
-      ],
-    ];
+      // Apply filters
+      if (status) {
+        queryBuilder.andWhere("application.status = :status", { status });
+      }
 
-    const timestamp = new Date().toISOString().slice(0, 10);
+      if (workPeriod) {
+        queryBuilder.andWhere("application.workPeriod = :workPeriod", {
+          workPeriod,
+        });
+      }
 
-    return {
-      success: true,
-      data: {
-        filename: `basvurular_${timestamp}.csv`,
-        headers,
-        rows,
-        count: rows.length,
-      },
-    };
+      if (search) {
+        queryBuilder.andWhere(
+          "(application.firstName ILIKE :search OR application.lastName ILIKE :search OR application.email ILIKE :search OR application.phone ILIKE :search)",
+          { search: `%${search}%` }
+        );
+      }
+
+      const applications = await queryBuilder.getMany();
+
+      const headers = [
+        "ID",
+        "Ad",
+        "Soyad",
+        "E-posta",
+        "Telefon",
+        "Şehir",
+        "Çalışma Periyodu",
+        "Durum",
+        "Başvuru Tarihi",
+      ];
+
+      const rows = applications.map((app) => [
+        app.id,
+        app.firstName,
+        app.lastName,
+        app.email,
+        app.phone,
+        app.city,
+        app.workPeriod,
+        app.status,
+        app.createdAt.toISOString().split("T")[0],
+      ]);
+
+      const timestamp = new Date().toISOString().slice(0, 10);
+
+      return {
+        success: true,
+        data: {
+          filename: `basvurular_${timestamp}.csv`,
+          headers,
+          rows,
+          count: rows.length,
+        },
+      };
+    } catch (error) {
+      console.error("Error exporting applications:", error);
+      throw error;
+    }
   }
 }
