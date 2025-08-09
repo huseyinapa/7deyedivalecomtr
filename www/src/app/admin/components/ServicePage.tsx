@@ -12,26 +12,46 @@ export default function ServicePage({ data, loading }: ServicePageProps) {
   }
 
   return (
-    <div className="space-y-4">
-      <h2 className="text-2xl font-bold">Hizmet Talepleri</h2>
-      <div className="text-gray-600">
-        Toplam {data.length} hizmet talebi bulunmaktadır.
-      </div>
-      {data.length === 0 ? (
-        <div className="text-center text-gray-500">
-          Henüz hizmet talebi bulunmamaktadır.
-        </div>
-      ) : (
-        <div className="grid gap-4">
-          {data.map((service) => (
-            <div key={service.id} className="border rounded-lg p-4">
-              <h3 className="font-bold">{service.companyName}</h3>
-              <p>İletişim: {service.contactName} - {service.contactEmail}</p>
-              <p>Durum: {service.status}</p>
-            </div>
-          ))}
-        </div>
-      )}
+    <div className="overflow-x-auto">
+      <h2 className="text-2xl font-bold mb-4">Kurye Hizmeti Al</h2>
+      <table className="min-w-full divide-y divide-gray-200">
+        <thead className="bg-gray-50">
+          <tr>
+            <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Firma</th>
+            <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Yetkili</th>
+            <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Telefon</th>
+            <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">E-posta</th>
+            <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Şehir</th>
+            <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">İlçe</th>
+            <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Kurye Tipi</th>
+            <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Kurye Sayısı</th>
+            <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Durum</th>
+            <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Tarih</th>
+          </tr>
+        </thead>
+        <tbody className="bg-white divide-y divide-gray-200">
+          {data && data.length > 0 ? (
+            data.map((row: any) => (
+              <tr key={row.id}>
+                <td className="px-4 py-2">{row.companyName}</td>
+                <td className="px-4 py-2">{row.contactName}</td>
+                <td className="px-4 py-2">{row.contactPhone}</td>
+                <td className="px-4 py-2">{row.contactEmail}</td>
+                <td className="px-4 py-2">{row.city}</td>
+                <td className="px-4 py-2">{row.district}</td>
+                <td className="px-4 py-2">{row.courierType}</td>
+                <td className="px-4 py-2">{row.courierCount}</td>
+                <td className="px-4 py-2">{row.status}</td>
+                <td className="px-4 py-2">{row.createdAt ? new Date(row.createdAt).toLocaleString('tr-TR') : ''}</td>
+              </tr>
+            ))
+          ) : (
+            <tr>
+              <td colSpan={10} className="text-center py-4 text-gray-500">Henüz hizmet talebi bulunmamaktadır.</td>
+            </tr>
+          )}
+        </tbody>
+      </table>
     </div>
   );
 }

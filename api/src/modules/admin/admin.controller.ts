@@ -59,6 +59,7 @@ export class AdminController {
       pendingApplications: number;
       approvedApplications: number;
       rejectedApplications: number;
+      interviewedApplications: number;
       todayOrders: number;
       weeklyRevenue: number;
       monthlyRevenue: number;
@@ -104,6 +105,10 @@ export class AdminController {
       const rejectedApplications = applications.filter(
         (app) => app.status === "rejected"
       ).length;
+      const interviewedApplications = applications.filter(
+        (app) => app.status === "interviewed"
+      ).length;
+
       const recentSuccessfulLogins = loginAttempts.filter(
         (attempt) =>
           attempt.success &&
@@ -123,6 +128,7 @@ export class AdminController {
           pendingApplications,
           approvedApplications,
           rejectedApplications,
+          interviewedApplications,
           todayOrders: 0, // Not implemented yet
           weeklyRevenue: 0, // Not implemented yet
           monthlyRevenue: 0, // Not implemented yet
@@ -831,6 +837,7 @@ export class AdminController {
         count: number;
         approved: number;
         rejected: number;
+        interviewed: number;
       }>;
     };
   }> {
@@ -887,7 +894,9 @@ export class AdminController {
                 ? "Onaylandı"
                 : status === "rejected"
                   ? "Reddedildi"
-                  : status,
+                  : status === "interviewed"
+                    ? "Görüşmeye Çağırıldı"
+                    : status,
         })
       );
 
@@ -950,6 +959,9 @@ export class AdminController {
             .length,
           rejected: monthApplications.filter((app) => app.status === "rejected")
             .length,
+          interviewed: monthApplications.filter(
+            (app) => app.status === "interviewed"
+          ).length,
         });
       }
 
@@ -1078,7 +1090,7 @@ export class AdminController {
     };
   }> {
     try {
-      const validStatuses = ["pending", "approved", "rejected"];
+      const validStatuses = ["pending", "approved", "rejected", "interviewed"];
 
       if (!validStatuses.includes(status)) {
         return {

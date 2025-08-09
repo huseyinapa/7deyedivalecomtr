@@ -35,7 +35,12 @@ export default function Error({
         </div>
         <h2 className="text-xl font-bold text-gray-900 mb-2">Bir hata oluştu</h2>
         <p className="text-gray-600 mb-6">
-          Admin paneli yüklenirken bir sorun oluştu. Lütfen tekrar deneyin.
+          Admin paneli yüklenirken bir sorun oluştu. Lütfen tekrar deneyin.<br />
+          <span className="block mt-2 text-xs text-red-500">
+            {error?.message && <span><b>Hata Mesajı:</b> {error.message}</span>}
+            {error?.name && <span className="ml-2"><b>Tür:</b> {error.name}</span>}
+            {error?.digest && <span className="ml-2"><b>Kod:</b> {error.digest}</span>}
+          </span>
         </p>
         <div className="space-x-4">
           <button

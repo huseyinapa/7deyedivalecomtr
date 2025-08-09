@@ -12,28 +12,48 @@ export default function CallPage({ data, loading }: CallPageProps) {
   }
 
   return (
-    <div className="space-y-4">
-      <h2 className="text-2xl font-bold">Çağrılar</h2>
-      <div className="text-gray-600">
-        Toplam {data.length} çağrı bulunmaktadır.
-      </div>
-      {data.length === 0 ? (
-        <div className="text-center text-gray-500">
-          Henüz çağrı bulunmamaktadır.
-        </div>
-      ) : (
-        <div className="grid gap-4">
-          {data.map((call) => (
-            <div key={call.id} className="border rounded-lg p-4">
-              <h3 className="font-bold">{call.senderName}</h3>
-              <p>Telefon: {call.senderPhone}</p>
-              <p>Alış: {call.senderAddress}</p>
-              <p>Varış: {call.receiverAddress}</p>
-              <p>Durum: {call.status}</p>
-            </div>
-          ))}
-        </div>
-      )}
+    <div className="overflow-x-auto">
+      <h2 className="text-2xl font-bold mb-4">Kurye Çağır</h2>
+      <table className="min-w-full divide-y divide-gray-200">
+        <thead className="bg-gray-50">
+          <tr>
+            <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Gönderen</th>
+            <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Telefon</th>
+            <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Adres</th>
+            <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Alıcı</th>
+            <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Telefon</th>
+            <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Adres</th>
+            <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Paket</th>
+            <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Ağırlık (kg)</th>
+            <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Değer (₺)</th>
+            <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Durum</th>
+            <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Tarih</th>
+          </tr>
+        </thead>
+        <tbody className="bg-white divide-y divide-gray-200">
+          {data && data.length > 0 ? (
+            data.map((row: any) => (
+              <tr key={row.id}>
+                <td className="px-4 py-2">{row.senderName}</td>
+                <td className="px-4 py-2">{row.senderPhone}</td>
+                <td className="px-4 py-2">{row.senderAddress}</td>
+                <td className="px-4 py-2">{row.receiverName}</td>
+                <td className="px-4 py-2">{row.receiverPhone}</td>
+                <td className="px-4 py-2">{row.receiverAddress}</td>
+                <td className="px-4 py-2">{row.packageType}</td>
+                <td className="px-4 py-2">{row.weight}</td>
+                <td className="px-4 py-2">{row.value}</td>
+                <td className="px-4 py-2">{row.status}</td>
+                <td className="px-4 py-2">{row.createdAt ? new Date(row.createdAt).toLocaleString('tr-TR') : ''}</td>
+              </tr>
+            ))
+          ) : (
+            <tr>
+              <td colSpan={11} className="text-center py-4 text-gray-500">Henüz çağrı bulunmamaktadır.</td>
+            </tr>
+          )}
+        </tbody>
+      </table>
     </div>
   );
 }
