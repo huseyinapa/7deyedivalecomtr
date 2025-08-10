@@ -130,13 +130,30 @@ export interface UpdateUserDto {
 // Application Management Interfaces
 export interface ApplicationSummary {
   id: string;
+  uid?: string;
   firstName: string;
   lastName: string;
   email: string;
   phone: string;
   city: string;
-  workPeriod: string;
+  district?: string;
+  address?: string;
+  birthDate?: string;
+  gender?: string;
+  nationality?: string;
+  idNumber?: string;
+  maritalStatus?: string;
+  militaryStatus?: string;
+  education?: string;
+  licenseClass?: string;
+  vehicleType?: string;
+  workPeriod?: string;
+  hasVehicle?: boolean;
+  courierExperience?: string;
+  workExperiences?: string;
+  references?: string;
   status: string;
+  notes?: string;
   completionRate: number;
   createdAt: string;
   updatedAt: string;

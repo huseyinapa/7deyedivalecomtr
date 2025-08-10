@@ -661,13 +661,30 @@ export class AdminController {
     data: {
       applications: Array<{
         id: string;
+        uid?: string;
         firstName: string;
         lastName: string;
         email: string;
         phone: string;
         city: string;
-        workPeriod: string;
+        district?: string;
+        address?: string;
+        birthDate?: string;
+        gender?: string;
+        nationality?: string;
+        idNumber?: string;
+        maritalStatus?: string;
+        militaryStatus?: string;
+        education?: string;
+        licenseClass?: string;
+        vehicleType?: string;
+        workPeriod?: string;
+        hasVehicle?: boolean;
+        courierExperience?: string;
+        workExperiences?: string;
+        references?: string;
         status: string;
+        notes?: string;
         completionRate: number;
         createdAt: string;
         updatedAt: string;
@@ -762,13 +779,30 @@ export class AdminController {
         data: {
           applications: applications.map((app) => ({
             id: app.id,
+            uid: app.uid,
             firstName: app.firstName,
             lastName: app.lastName,
             email: app.email,
             phone: app.phone,
             city: app.city,
+            district: app.district,
+            address: app.address,
+            birthDate: app.birthDate,
+            gender: app.gender,
+            nationality: app.nationality,
+            idNumber: app.idNumber,
+            maritalStatus: app.maritalStatus,
+            militaryStatus: app.militaryStatus,
+            education: app.education,
+            licenseClass: app.licenseClass,
+            vehicleType: app.vehicleType,
             workPeriod: app.workPeriod,
+            hasVehicle: app.hasVehicle,
+            courierExperience: app.courierExperience,
+            workExperiences: app.workExperiences,
+            references: app.references,
             status: app.status,
+            notes: app.notes,
             completionRate: 0, // TODO: Calculate from actual data
             createdAt: app.createdAt.toISOString(),
             updatedAt: app.updatedAt.toISOString(),

@@ -75,6 +75,8 @@ export default function ApplicationPageNew() {
 
   const isInitialLoading = isLoading && (!applications || applications.length === 0);
 
+  console.log("Debug: ApplicationPageNew", { selectedApplication });
+
   return (
     <div className="container mx-auto p-6">
       <h1 className="text-2xl font-bold mb-6">Kurye Başvuruları</h1>
@@ -147,7 +149,10 @@ export default function ApplicationPageNew() {
                               }
                             )}
                           >
-                            {app.status === "pending" ? "Beklemede" : app.status === "approved" ? "Onaylandı" : app.status}
+                            {app.status === "pending" && "Beklemede"}
+                            {app.status === "approved" && "Onaylandı"}
+                            {app.status === "rejected" && "Reddedildi"}
+                            {app.status === "interviewed" && "Görüşmeye Çağırıldı"}
                             <svg className="w-3 h-3 opacity-70" viewBox="0 0 20 20" fill="currentColor">
                               <path
                                 fillRule="evenodd"
