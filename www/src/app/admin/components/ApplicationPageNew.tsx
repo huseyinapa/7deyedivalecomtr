@@ -134,7 +134,7 @@ export default function ApplicationPageNew() {
                 return (
                   <tr key={app.id} className="hover:bg-gray-50">
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{app.firstName} {app.lastName}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{app.phone} {app.status}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{app.phone}</td>
                     <td className="px-6 py-4 whitespace-nowrap relative">
                       <DropdownMenu.Root>
                         <DropdownMenu.Trigger asChild>
