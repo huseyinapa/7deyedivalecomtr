@@ -102,6 +102,7 @@ export default function ApplicationPageNew() {
           className="px-4 py-2 border rounded-lg"
         >
           <option value="">Tüm Durumlar</option>
+          <option value="interviewed">Görüşmeye Çağrılan</option>
           <option value="pending">Bekleyen</option>
           <option value="approved">Onaylanan</option>
           <option value="rejected">Reddedilen</option>
@@ -139,10 +140,10 @@ export default function ApplicationPageNew() {
                             className={cn(`inline-flex items-center gap-2 px-2 py-1 text-xs font-semibold rounded-full transition`,
                               {
                                 "data-state": app.status,
-                                "bg-red-100 text-red-800 hover:bg-red-200": app.status.includes("Reddedildi"),
-                                "bg-yellow-100 text-yellow-800 hover:bg-yellow-200": app.status === "pending" || app.status.includes("Beklemede"),
-                                "bg-gray-100 text-gray-800 hover:bg-gray-200": app.status.includes("Görüşmeye Çağırıldı"),
-                                "bg-green-100 text-green-800 hover:bg-green-200": app.status.includes("approved"),
+                                "bg-red-100 text-red-800 hover:bg-red-200": app.status.includes("Reddedildi") || app.status === "rejected",
+                                "bg-yellow-100 text-yellow-800 hover:bg-yellow-200": app.status.includes("Beklemede") || app.status === "pending",
+                                "bg-gray-100 text-gray-800 hover:bg-gray-200": app.status.includes("Görüşmeye Çağırıldı") || app.status === "interviewed",
+                                "bg-green-100 text-green-800 hover:bg-green-200": app.status.includes("approved") || app.status === "approved",
                               }
                             )}
                           >
@@ -166,6 +167,7 @@ export default function ApplicationPageNew() {
                               <DropdownMenu.Item
                                 key={status}
                                 onSelect={async () => {
+                                  console.log(`Updating status to ${status} for application ${app.id}`);
                                   if (updatingId) return;
                                   try {
                                     setUpdatingId(app.id);
@@ -180,7 +182,7 @@ export default function ApplicationPageNew() {
                                 disabled={updatingId === app.id}
                                 className={`cursor-pointer select-none rounded-sm px-3 py-2 text-sm outline-none data-[highlighted]:bg-gray-50 data-[disabled]:opacity-50 ${app.status === status ? "text-blue-600 font-medium" : "text-gray-700"}`}
                               >
-                                {status === "pending" ? "Beklemede" : status === "approved" ? "Onayla" : status === "rejected" ? "Reddet" : "Görüşmeye Çağır"}
+                                {status === "pending" ? "Beklemede" : status === "approved" ? "Onayla" : status === "interviewed" ? "Görüşmeye Çağır" : "Reddet"}
                                 {updatingId === app.id && <span className="float-right text-xs text-gray-400">...</span>}
                               </DropdownMenu.Item>
                             ))}

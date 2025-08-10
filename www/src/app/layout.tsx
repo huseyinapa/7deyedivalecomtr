@@ -4,6 +4,7 @@ import GoogleAnalytics from "../lib/analytics/analytics";
 import Header from "@/components/layout/header";
 import Footer from "@/components/layout/footer";
 import SWRProvider from "@/components/providers/swr-provider";
+import AdminWrapper from "@/components/layout/admin-wrapper";
 
 const inter = Open_Sans({ subsets: ["latin"] });
 
@@ -66,15 +67,9 @@ export default function RootLayout({ children }: RootLayoutProps) {
       </head>
       <body className={inter.className}>
         <SWRProvider>
-          {isAdminPage ? (
-            <>{children}</>
-          ) : (
-            <>
-              <Header />
-              {children}
-              <Footer />
-            </>
-          )}
+          <AdminWrapper>
+            {children}
+          </AdminWrapper>
           <GoogleAnalytics />
         </SWRProvider>
       </body>
