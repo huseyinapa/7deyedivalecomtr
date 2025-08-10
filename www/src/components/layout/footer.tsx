@@ -6,7 +6,7 @@ export default function Footer() {
 
   return (
     <footer className="relative footer flex flex-col h-[240px] sm:h-[270px] md:h-[300px] lg:h-[300px] xl:h-[370px] text-base-content justify-between items-center bg-[#EDC81E] rounded-t-3xl">
-      <div className="flex flex-col md:flex-row w-[99%] justify-between items-center md:p-4">
+      <div className="flex flex-col md:flex-row w-[99%] justify-between items-center md:p-4 z-10">
         <Image
           alt="YediLogo"
           src="/assets/yedi_siyah.png"
@@ -15,7 +15,7 @@ export default function Footer() {
           height={70}
           sizes="(max-width: 768px) 150px, 270px"
         />
-        <div className="footer flex flex-row justify-center md:justify-end lg:gap-10 md:pr-28">
+        <div className="footer flex flex-row justify-center md:justify-end lg:gap-10 md:pr-28 3421c3sdeq24">
           <nav className="flex flex-col items-center md:items-start">
             <header className="uppercase opacity-60 font-bold text-xs md:text-base lg:text-lg">
               ŞIRKET
@@ -51,7 +51,9 @@ export default function Footer() {
               Medya
             </header>
             <div className="grid grid-flow-col gap-2 md:gap-4">
-              <a href="https://www.instagram.com/7de.yedivale/" target="_blank">
+              <a
+                className="z-10"
+                href="https://www.instagram.com/7de.yedivale/" target="_blank">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   width="24"
@@ -63,8 +65,12 @@ export default function Footer() {
                 </svg>
               </a>
               <a
-                href="https://api.whatsapp.com/send?phone=905317611032"
-                target="_blank"
+                href="#"
+                className="z-10"
+                onClick={(e) => {
+                  e.preventDefault();
+                  window.open("https://wa.me/905317611032", "_blank");
+                }}
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -80,7 +86,7 @@ export default function Footer() {
           </nav>
         </div>
       </div>
-      <aside className="absolute bottom-0 flex justify-center">
+      <aside className="absolute bottom-0 flex justify-center -z-0">
         <div className="relative">
           <Image
             className="w-screen object-bottom object-contain xl:object-cover h-[245px]"
@@ -92,10 +98,10 @@ export default function Footer() {
             loading="lazy"
           />
           <Image
-            className="absolute bottom-0 left-14 max-h-[220px] h-[20%] sm:h-[40%] md:h-[60%] lg:h-[70%] xl:h-[70%] 2xl:left-[100px] object-cover"
+            className="absolute bottom-0 left-14 max-h-[220px] h-[40%] sm:h-[40%] md:h-[60%] lg:h-[70%] xl:h-[70%] 2xl:left-[100px] object-cover"
             alt="motor"
             src="/assets/motor.png"
-            width={200}
+            width={210}
             height={220}
             loading="lazy"
           />
