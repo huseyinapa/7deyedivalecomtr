@@ -9,6 +9,11 @@ import {
 } from "class-validator";
 import { ApiProperty } from "@nestjs/swagger";
 
+enum CourierType {
+  POOL = "pool",
+  FIXED = "fixed",
+}
+
 export class CreateCourierServiceDto {
   @ApiProperty({ description: "Company name" })
   @IsNotEmpty()
@@ -52,7 +57,7 @@ export class CreateCourierServiceDto {
   })
   @IsOptional()
   @IsString()
-  courierType?: string;
+  courierType?: CourierType;
 
   @ApiProperty({ description: "Number of couriers needed", required: false })
   @IsOptional()

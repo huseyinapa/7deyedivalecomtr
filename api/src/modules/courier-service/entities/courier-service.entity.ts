@@ -7,6 +7,11 @@ import {
 } from "typeorm";
 import { ApiProperty } from "@nestjs/swagger";
 
+enum CourierType {
+  POOL = "pool",
+  FIXED = "fixed",
+}
+
 @Entity({ name: "courier_service" })
 export class CourierService {
   @ApiProperty({ description: "Unique identifier" })
@@ -43,7 +48,7 @@ export class CourierService {
 
   @ApiProperty({ description: "Type of courier service needed" })
   @Column({ nullable: true })
-  courierType: string;
+  courierType: CourierType;
 
   @ApiProperty({ description: "Number of couriers needed" })
   @Column({ type: "int", nullable: true })
