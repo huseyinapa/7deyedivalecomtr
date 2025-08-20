@@ -116,7 +116,7 @@ export default function JobExperience({ applicationData, setApplicationData }: J
           </div>
           <div className="mx-auto w-[90%] h-0.5 bg-white" />
           <div className="flex flex-col md:flex-row items-center md:justify-evenly gap-4 mb-2">
-            <div className="w-[220px]">
+            <div className="w-full">
               <div className="mb-2">
                 <span className="text-sm text-white">
                   Kuryelik Tecrübeniz:
@@ -124,7 +124,7 @@ export default function JobExperience({ applicationData, setApplicationData }: J
               </div>
               <select
                 name="courierExperience"
-                className="border border-gray-300 bg-white px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-full w-full h-12 text-gray-900"
+                className="border border-gray-300 bg-white px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-full w-[220px] md:w-[495px] h-12 text-gray-900"
                 onChange={handleChange}
                 value={experiences.courierExperience || ""}
               >
@@ -134,20 +134,6 @@ export default function JobExperience({ applicationData, setApplicationData }: J
                 <option value="3-5 Yıl">3-5 Yıl</option>
                 <option value="5 Yıl ve Üzeri">5 Yıl ve Üzeri</option>
               </select>
-            </div>
-            <div className="w-[220px]">
-              <div className="mb-2">
-                <span className="text-sm text-white">
-                  Nerelerde Tecrübe Kazandınız?
-                </span>
-              </div>
-              <input
-                name="workExperiences"
-                type="text"
-                className="border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 w-full h-12 bg-white rounded-full text-gray-900"
-                onChange={handleChange}
-                value={experiences.workExperiences || ""}
-              />
             </div>
           </div>
           <div className="flex flex-col w-[285px] md:w-[568px] mx-auto items-center md:justify-center gap-2">
@@ -180,36 +166,6 @@ export default function JobExperience({ applicationData, setApplicationData }: J
                         name="position"
                         className="border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 w-full h-12 bg-white rounded-full text-gray-900"
                         value={experience.position || ""}
-                        onChange={(e) => handleChangeExperiences(index, e)}
-                      />
-                    </div>
-                  </div>
-                  <div className="flex flex-col md:flex-row items-center md:justify-between gap-4">
-                    <div className="w-[220px]">
-                      <div className="mb-2">
-                        <span className="text-sm text-white">
-                          Başlangıç Tarihi
-                        </span>
-                      </div>
-                      <input
-                        type="date"
-                        name="startDate"
-                        className="border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 w-full h-12 bg-white rounded-full text-gray-900"
-                        value={experience.startDate}
-                        onChange={(e) => handleChangeExperiences(index, e)}
-                      />
-                    </div>
-                    <div className="w-[220px]">
-                      <div className="mb-2">
-                        <span className="text-sm text-white">
-                          Bitiş Tarihi
-                        </span>
-                      </div>
-                      <input
-                        type="date"
-                        name="endDate"
-                        className="border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 w-full h-12 bg-white rounded-full text-gray-900"
-                        value={experience.endDate}
                         onChange={(e) => handleChangeExperiences(index, e)}
                       />
                     </div>

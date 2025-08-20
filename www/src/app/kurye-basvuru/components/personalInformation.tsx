@@ -21,9 +21,9 @@ export default function PersonalInformation({
   return (
     <section
       id={"personalInformation"}
-      className="min-w-[300px] sm:w-[50%] md:w-[600px] max-w-[600px] min-h-[1050px] md:min-h-[550px] bg-[#333] rounded-2xl p-6"
+      className="min-w-[300px] sm:w-[50%] md:w-[600px] max-w-[600px] min-h-[900px] md:min-h-[450px] bg-[#333] rounded-2xl p-6"
     >
-      <div className="flex flex-col justify-center items-center h-full">
+      <div className="flex flex-col justify-center items-center h-full gap-2">
         <div className="text-2xl text-white mb-6 font-semibold">
           Kişisel Bilgiler
         </div>
@@ -55,42 +55,6 @@ export default function PersonalInformation({
               required
             />
           </div>
-        </div>
-        <div className="flex flex-col md:flex-row items-center md:justify-evenly gap-4">
-          <div className="w-[220px]">
-            <div className="mb-2">
-              <span className="text-sm text-white">Uyruğunuz:</span>
-            </div>
-            <select
-              name="nationality"
-              className="border border-gray-300 bg-white px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-full w-full h-12 text-gray-900"
-              onChange={handleChange}
-              value={applicationData.personalInformation.nationality || ""}
-              required
-            >
-              <option value="" disabled>
-                Seçiniz
-              </option>
-              <option value="Türk">Türk</option>
-              <option value="Diğer">Diğer</option>
-            </select>
-          </div>
-          {
-            applicationData.personalInformation.nationality === "Türk" && (
-              <div className="w-[220px]">
-                <div className="mb-2">
-                  <span className="text-sm text-white">T.C Kimlik No</span>
-                </div>
-                <input
-                  type="text"
-                  name="idNumber"
-                  className="border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 w-full h-12 bg-white rounded-full text-gray-900"
-                  onChange={handleChange}
-                  value={applicationData.personalInformation.idNumber || ""}
-                  required
-                />
-              </div>
-            )}
         </div>
         <div className="flex flex-col md:flex-row items-center md:justify-evenly gap-4">
           <div className="w-[220px]">
@@ -146,50 +110,6 @@ export default function PersonalInformation({
           </div>
           <div className="w-[220px]">
             <div className="mb-2">
-              <span className="text-sm text-white">Askerlik Durumu:</span>
-            </div>
-            <select
-              name="militaryStatus"
-              className="border border-gray-300 bg-white px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-full w-full h-12 text-gray-900"
-              onChange={handleChange}
-              value={applicationData.personalInformation.militaryStatus || ""}
-              required
-            >
-              <option value="" disabled>
-                Seçiniz
-              </option>
-              <option value="Yapıldı">Yapıldı</option>
-              <option value="Yapılmadı">Yapılmadı</option>
-              <option value="Muaf">Muaf</option>
-            </select>
-          </div>
-        </div>
-        <div className="flex flex-col md:flex-row items-center md:justify-evenly gap-4">
-          <div className="w-[220px]">
-            <div className="mb-2">
-              <span className="text-sm text-white">Eğitim Durumu:</span>
-            </div>
-            <select
-              name="education"
-              className="border border-gray-300 bg-white px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-full w-full h-12 text-gray-900"
-              onChange={handleChange}
-              value={applicationData.personalInformation.education || ""}
-              required
-            >
-              <option value="" disabled>
-                Seçiniz
-              </option>
-              <option value="İlkokul">İlkokul</option>
-              <option value="Ortaokul">Ortaokul</option>
-              <option value="Lise">Lise</option>
-              <option value="Üniversite">Üniversite</option>
-              <option value="Yüksek Lisans">Yüksek Lisans</option>
-              <option value="Doktora">Doktora</option>
-            </select>
-          </div>
-
-          <div className="w-[220px]">
-            <div className="mb-2">
               <span className="text-sm text-white">Ehliyet Sınıfı:</span>
             </div>
             <select
@@ -213,6 +133,6 @@ export default function PersonalInformation({
           </div>
         </div>
       </div>
-    </section>
+    </section >
   );
 }

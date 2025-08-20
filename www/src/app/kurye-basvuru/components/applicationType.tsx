@@ -133,7 +133,6 @@ export default function ApplicationType({
               <option value="Araç/Minivan">Araç/Minivan</option>
               <option value="Panelvan">Panelvan</option>
               <option value="Kamyonet">Kamyonet</option>
-              <option value="Zodyak">Zodyak</option>
             </select>
           </div>
           <div className="w-[220px]">
@@ -150,7 +149,6 @@ export default function ApplicationType({
                 Seçiniz
               </option>
               <option value="Tam Zamanlı">Tam Zamanlı</option>
-              <option value="Sezonluk">Sezonluk</option>
               <option value="Part Time">Part Time</option>
             </select>
           </div>

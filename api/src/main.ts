@@ -42,19 +42,16 @@ async function bootstrap() {
       // Allow requests with no origin (like mobile apps or curl requests)
       if (!origin) return callback(null, true);
 
-      // Check if origin is in allowed list
       if (corsOrigins.includes(origin)) {
         return callback(null, true);
       }
 
-      // Development mode - allow all localhost and 127.0.0.1 requests
       if (process.env.NODE_ENV !== "production") {
         if (origin.includes("localhost") || origin.includes("127.0.0.1")) {
           return callback(null, true);
         }
       }
 
-      // TEMPORARY: Log the origin that's being blocked for debugging
       console.log(`CORS blocked origin: ${origin}`);
       console.log(`Allowed origins: ${corsOrigins.join(", ")}`);
 

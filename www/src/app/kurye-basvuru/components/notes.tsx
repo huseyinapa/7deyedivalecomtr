@@ -32,13 +32,13 @@ export default function Notes({
   return (
     <section
       ref={notesRef}
-      className="card min-w-[300px] sm:w-[50%] md:w-[600px] max-w-[600px] min-h-[500px] md:min-h-[400px] bg-[#333] rounded-2xl"
+      className="card min-w-[300px] sm:w-[50%] md:w-[600px] max-w-[600px] min-h-[500px] md:min-h-[400px] bg-[#333] rounded-2xl p-4"
     >
       <div className="flex flex-col justify-center items-center h-full ">
-        <div className="text-2xl font-semibold text-white justify-start ml-8 mb-2">
+        <div className="text-2xl font-semibold text-white justify-start mb-2">
           Notlar
         </div>
-        <div className="mx-auto w-[90%] h-0.5 bg-white " />
+        <div className="mx-auto w-[90%] h-0.5 bg-white gap-4" />
         <div className="flex flex-col md:flex-row items-center md:justify-evenly gap-4">
           <div className="w-[220px]">
             <div className="mb-2">

@@ -66,9 +66,9 @@ export default function ContactInformation({
   return (
     <section
       id={"contactInformation"}
-      className="min-w-[300px] sm:w-[50%] md:w-[600px] max-w-[600px] min-h-[590px] md:min-h-[390px] bg-[#333] rounded-2xl"
+      className="min-w-[300px] sm:w-[50%] md:w-[600px] max-w-[600px] min-h-[590px] md:min-h-[390px] bg-[#333] rounded-2xl p-6"
     >
-      <div className="p-0 flex flex-col justify-center items-center h-full">
+      <div className="p-0 flex flex-col justify-center items-center h-full gap-2">
         <div className="text-2xl font-semibold text-white justify-start ml-8 mb-2">
           İletişim Bilgileri
         </div>
